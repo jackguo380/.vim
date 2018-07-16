@@ -21,7 +21,7 @@ Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 
 " x86 Highlighting
-Plugin 'shirk/vim-gas'
+"Plugin 'shirk/vim-gas'
 
 " Git Integration
 Plugin 'tpope/vim-fugitive'

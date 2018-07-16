@@ -4,7 +4,7 @@ MYNAME="Jack Guo"
 # -- Git --
 REPO=https://github.com/vim/vim.git
 # Version to checkout
-VER=master
+VER=v8.0.1850
 
 # -- Compilation --
 VIM_RUNTIME_DIR=/usr/local/share/vim/vim80
