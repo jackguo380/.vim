@@ -1,0 +1,13 @@
+diff --git a/cpp/CMakeLists.txt b/cpp/CMakeLists.txt
+index 165eb7a..a5a1f64 100644
+--- a/cpp/CMakeLists.txt
++++ b/cpp/CMakeLists.txt
+@@ -15,6 +15,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with ycmd.  If not, see <http://www.gnu.org/licenses/>.
+ 
++add_compile_options(-O3)
++
+ if ( APPLE )
+   # OSX requires CMake >= 2.8.12, see YCM issue #1439
+   cmake_minimum_required( VERSION 2.8.12 )

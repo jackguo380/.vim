@@ -1,12 +1,13 @@
 "YouCompleteMe
 let g:ycm_extra_conf_globlist = ['~/devel/*', '~/Documents/*']
-let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py'
+let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 let g:ycm_enable_diagnostic_signs = 1
-"let g:ycm_enable_diagnostic_highlighting = 0
 let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_autoclose_preview_window_after_completion = 1
+let g:ycm_min_num_of_chars_for_completion = 99
+let g:ycm_disable_for_files_larger_than_kb = 0
 let g:airline_exclude_preview = 0 "Fix Airline Bug with preview window
-let g:ycm_python_binary_path = 'python3'
+"let g:ycm_python_binary_path = 'python3'
 set completeopt-=preview
 
 nmap cyg :YcmCompleter GoToDefinition<CR>
