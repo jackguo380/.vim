@@ -10,10 +10,12 @@ ROOT_DIR="$PWD"
 read -p "Install vim [y/n]?" yn
 
 if [ "$yn" = y ]; then
-    if ! vim-install.sh; then
+    cd "$HOME" 
+    if ! .vim/vim-install.sh; then
         echo "Failed to install vim"
         exit 1
     fi
+    cd .vim
 fi
 
 if [ ! -d ./bundle/Vundle.vim ]; then
