@@ -31,6 +31,11 @@ cd "$ROOT_DIR"
 # Run vundle to configure all plugins, ignore the errors from this
 vim +PluginInstall +qall
 
+read -p "Install llvm6+clang6 [y/n]?" yn
+if [ "$yn" = y ]; then
+    sudo apt install -y llvm-6.0 llvm-6.0-dev clang-6.0 libclang-6.0-dev
+fi
+
 if [ -d ./bundle/color_coded ]; then
     cd ./bundle/color_coded
     # Add support for llvm-6.0
@@ -45,6 +50,7 @@ if [ -d ./bundle/color_coded ]; then
         echo "Failed to build color coded"
         exit 1
     fi
+    rm ./* -r
 else
     echo "color coded failed to download"
     exit 1
