@@ -58,8 +58,8 @@ do_apt() {
 }
 
 do_configure() {
-    make distclean
-    ./configure "${CONFIG_OPTS[@]}"
+    make clean distclean
+    CFLAGS="-O3" CPPFLAGS="-O3" ./configure "${CONFIG_OPTS[@]}"
 
     if [ $? -ne 0 ]; then
         echo "Failed to configure Vim"
