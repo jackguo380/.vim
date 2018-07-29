@@ -43,7 +43,8 @@ if [ -d ./bundle/color_coded ]; then
     mkdir build
     cd build
     # Let cmake find llvm-config
-    cmake -DDOWNLOAD_CLANG=0 .. && \
+    cmake -DDOWNLOAD_CLANG=0 -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_VERBOSE_MAKEFILE=1 .. && \
     make -j$(nproc) && \
     make install
     if [ $? -ne 0 ]; then
@@ -61,7 +62,6 @@ cd "$ROOT_DIR"
 if [ -d ./bundle/YouCompleteMe ]; then
     cd ./bundle/YouCompleteMe
 
-    # These optimizations are useful for large projects
     cd third_party/ycmd
     git apply "$ROOT_DIR"/ycmd_optimization.diff
 
@@ -70,7 +70,8 @@ if [ -d ./bundle/YouCompleteMe ]; then
 
     cd "$ROOT_DIR"/bundle/YouCompleteMe
 
-    ./install.py --clang-completer --system-libclang
+    EXTRA_CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1" \
+        ./install.py --clang-completer --system-libclang
     if [ $? -ne 0 ]; then
         echo "Failed to build YouCompleteMe"
         exit 1
