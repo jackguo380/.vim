@@ -14,7 +14,7 @@ CONFIG_OPTS=(
     --enable-python3interp=yes 
     --enable-perlinterp=yes  
     --enable-luainterp=yes 
-    --with-lua-prefix=/usr/local
+#    --with-lua-prefix=/usr/local
     --enable-cscope 
     --enable-autoservername 
     --enable-terminal
