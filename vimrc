@@ -12,6 +12,8 @@ source ~/.vim/vimrcs/matchit.vimrc
 source ~/.vim/vimrcs/vundle.vimrc
 source ~/.vim/vimrcs/ycm.vimrc
 source ~/.vim/vimrcs/gtags.vimrc
+source ~/.vim/vimrcs/regexhelpers.vimrc
+source ~/.vim/vimrcs/ctrlp.vimrc
 
 syntax on
 set autoindent
@@ -48,3 +50,5 @@ let g:netrw_banner = 0 "remove banner
 let g:netrw_liststyle = 3 " Use the nice tree style listing
 
 source ~/.vim/vimrcs/colorscheme.vimrc
+
+set exrc secure
