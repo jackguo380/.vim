@@ -1,3 +1,4 @@
+#! /bin/bash
 # -- Compiled by Name --
 MYNAME="Jack Guo"
 
@@ -10,15 +11,15 @@ VER=v8.0.1850
 VIM_RUNTIME_DIR=/usr/local/share/vim/vim80
 CONFIG_OPTS=(
     --enable-pythoninterp=yes 
-    --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu 
     --enable-python3interp=yes 
-    --with-python3-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu 
-    --enable-perlinterp=yes 
-    --enable-rubyinterp=yes 
+    --enable-perlinterp=yes  
     --enable-luainterp=yes 
-    --enable-tclinterp=yes
+    --with-lua-prefix=/usr/local
     --enable-cscope 
-    --enable-gui=gnome
+    --enable-autoservername 
+    --enable-terminal
+    --enable-gui=gtk3
+    --enable-gtk3-check
     --with-features=huge 
     --with-x 
     --enable-fontset 
@@ -49,21 +50,13 @@ do_git_checkout() {
     fi
 }
 
-do_apt() {
-    sudo apt install libncurses5-dev libgnome2-dev libgnomeui-dev \
-        libgtk2.0-dev libatk1.0-dev libbonoboui2-dev \
-        libcairo2-dev libx11-dev libxpm-dev libxt-dev python-dev \
-        python3-dev ruby-dev lua5.1 lua5.1-dev libperl-dev liblua5.1-dev tcl-dev
-
-}
-
 do_configure() {
     make clean distclean
     CFLAGS="-O3" CPPFLAGS="-O3" ./configure "${CONFIG_OPTS[@]}"
 
     if [ $? -ne 0 ]; then
         echo "Failed to configure Vim"
-        exit 1
+        return 1
     fi
 
 }
@@ -95,6 +88,8 @@ do_alternatives() {
     sudo update-alternatives --set editor /usr/local/bin/vim
     sudo update-alternatives --install /usr/bin/vi vi /usr/local/bin/vim 1
     sudo update-alternatives --set vi /usr/local/bin/vim
+    sudo update-alternatives --install /usr/bin/vim vim /usr/local/bin/vim 1
+    sudo update-alternatives --set vim /usr/local/bin/vim
 }
 
 yn_prompt() {
@@ -127,20 +122,25 @@ if [ ! -f vim.h ]; then
     cd src
 fi
 
-if yn_prompt "Install common apt dependencies [y/n]?"; then
-    do_apt
-fi
 
 do_git_checkout
 
-do_configure
+while ! do_configure; do
+    if yn_prompt "Enter shell to install dependencies [y/n]?"; then
+        bash
+    else
+        exit 1
+    fi
+done
 
 do_compile
 
-if yn_prompt "Install [y/n]?"; then
+if yn_prompt "Enter shell to install [y/n]?"; then
+    bash
+elif yn_prompt "Install [y/n]?"; then
     do_install
-    do_alternatives
-else
-    echo "Exiting..."
 fi
 
+if yn_prompt "Do update-alternatives [y/n]?"; then
+    do_alternatives
+fi
