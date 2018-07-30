@@ -12,6 +12,9 @@ Plugin 'VundleVim/Vundle.vim' "Plugin Manager
 " Smart text/code completion, needs to be compiled
 Plugin 'Valloric/YouCompleteMe' 
 
+" eldar color scheme
+Plugin 'agude/vim-eldar'
+
 "gdb integration for vim
 "Plugin 'vim-scripts/Conque-GDB'
 
