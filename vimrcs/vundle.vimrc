@@ -9,8 +9,13 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim' "Plugin Manager
 
-" Smart text/code completion, needs to be compiled
-Plugin 'Valloric/YouCompleteMe' 
+if my_config ==# "all"
+    " Smart text/code completion, needs to be compiled
+    Plugin 'Valloric/YouCompleteMe' 
+
+    " Better C++ highlighting
+    Plugin 'jeaye/color_coded'
+endif
 
 " eldar color scheme
 Plugin 'agude/vim-eldar'
@@ -40,9 +45,6 @@ Plugin 'vim-scripts/indentpython.vim'
 
 " SystemVerilog Syntax and Coloring
 Plugin 'nachumk/systemverilog.vim'
-
-" Better C++ highlighting
-Plugin 'jeaye/color_coded'
 
 " YCM config generator
 Plugin 'rdnetto/YCM-Generator'

@@ -17,6 +17,38 @@ fi
 
 ROOT_DIR="$PWD"
 
+function usage {
+    cat <<EOF
+Usage: $0 [-c <config> ]
+-c <config>
+Configs:
+all - install all plugins
+nocompile - install only vimscript plugins
+EOF
+}
+
+CONFIG=all
+
+while getopts "c:h" opt; do 
+    case $opt in
+        c)
+            case "$OPTARG" in
+                all) ;;
+                nocompile) ;;
+                *) echo "Invalid config: $OPTARG"; exit 1 ;;
+            esac
+            CONFIG="$OPTARG"
+            ;;
+        h)
+            usage
+            ;;
+        *)
+            echo "Invalid option: $OPTARG" ;;
+    esac
+done
+
+echo "$CONFIG" > .config.txt
+
 read -p "Install vim [y/n]?" yn
 
 function compile_install {
@@ -118,4 +150,3 @@ else
     echo "YouCompleteMe failed to download"
     exit 1
 fi
-
