@@ -101,6 +101,10 @@ cd "$ROOT_DIR"
 # Run vundle to configure all plugins, ignore the errors from this
 vim +PluginInstall +qall
 
+if [ "$CONFIG" = nocompile ]; then
+    exit 0
+fi
+
 read -p "Install llvm6+clang6 via apt [y/n]?" yn
 if [ "$yn" = y ]; then
     sudo apt install -y llvm-6.0 llvm-6.0-dev clang-6.0 libclang-6.0-dev
