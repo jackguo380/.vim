@@ -1,8 +1,8 @@
 set nocompatible
 set encoding=utf-8
 
-if filereadable("~/.vim/.config.txt")
-    let my_config = readfile("~/.vim/.config.txt")[0]
+if filereadable($HOME . "/.vim/.config.txt")
+    let my_config = readfile($HOME . "/.vim/.config.txt")[0]
 else
     let my_config = "all"
 endif
