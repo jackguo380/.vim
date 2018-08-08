@@ -5,11 +5,6 @@ if ! which git; then
     exit 1
 fi
 
-if ! which cmake; then
-    echo "install cmake"
-    exit 1
-fi
-
 if [ "$(realpath --relative-to "$HOME" .)" != .vim ]; then
     echo "Execute this script in the .vim directory"
     exit 1
@@ -103,6 +98,11 @@ vim +PluginInstall +qall
 
 if [ "$CONFIG" = nocompile ]; then
     exit 0
+fi
+
+if ! which cmake; then
+    echo "install cmake"
+    exit 1
 fi
 
 read -p "Install llvm6+clang6 via apt [y/n]?" yn
