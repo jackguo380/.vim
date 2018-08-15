@@ -56,7 +56,7 @@ Plugin 'vhda/verilog_systemverilog.vim'
 Plugin 'kien/ctrlp.vim'
 
 " Better cmake syntax
-Plugin 'pboettch/vim-cmake-syntax'
+"Plugin 'pboettch/vim-cmake-syntax'
 
 " Better C++ highlighting
 Plugin 'bfrg/vim-cpp-modern'
