@@ -5,6 +5,7 @@ MYNAME="Jack Guo"
 # -- Git --
 REPO=https://github.com/vim/vim.git
 # Version to checkout
+# vim's master branch isn't too stable so its good use a known working version
 VER=v8.0.1850
 
 # -- Compilation --
@@ -30,6 +31,14 @@ CONFIG_OPTS=(
     --prefix=/usr/local
 )
 
+UBUNTU1604_APT_PKGS=(
+lua5.1
+liblua5.1-0-dev
+libperl-dev
+libpython-dev
+libpython3-dev
+)
+
 do_git_clone() {
     git clone "$REPO" vim
     
@@ -48,6 +57,10 @@ do_git_checkout() {
         echo "Failed to checkout $VER"
         exit 1
     fi
+}
+
+do_apt_packages() {
+    sudo apt install "${UBUNTU1604_APT_PKGS[@]}"
 }
 
 do_configure() {
@@ -125,6 +138,12 @@ fi
 
 do_git_checkout
 
+echo -e "The following apt packages are recommended for Ubuntu 16.04: ${UBUNTU1604_APT_PKGS[*]}\n"
+
+if yn_prompt "install them [y/n]?"; then
+    do_apt_packages
+fi
+
 while ! do_configure; do
     if yn_prompt "Enter shell to install dependencies [y/n]?"; then
         bash
@@ -135,9 +154,7 @@ done
 
 do_compile
 
-if yn_prompt "Enter shell to install [y/n]?"; then
-    bash
-elif yn_prompt "Install [y/n]?"; then
+if yn_prompt "Install [y/n]?"; then
     do_install
 fi
 

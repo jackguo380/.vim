@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if ! which git; then
-    echo "install git"
+    echo "Please install git"
     exit 1
 fi
 
@@ -14,15 +14,16 @@ ROOT_DIR="$PWD"
 
 function usage {
     cat <<EOF
-Usage: $0 [-c <config> ]
+Usage: $0 -c <config>
 -c <config>
 Configs:
 all - install all plugins
 nocompile - install only vimscript plugins
+
 EOF
 }
 
-CONFIG=all
+CONFIG=none
 
 while getopts "c:h" opt; do 
     case $opt in
@@ -36,11 +37,18 @@ while getopts "c:h" opt; do
             ;;
         h)
             usage
+            exit 0
             ;;
         *)
-            echo "Invalid option: $OPTARG" ;;
+            echo "Invalid option: $OPTARG"; exit 1 ;;
     esac
 done
+
+if [ "$CONFIG" = none ]; then
+    usage
+    echo "A configuration must be specified"
+    exit 1
+fi
 
 echo "$CONFIG" > .config.txt
 
@@ -63,6 +71,7 @@ function apt_install {
     sudo apt install vim vim-gnome
 }
 
+# Do installation based on which platform we are on
 if [ "$yn" = y ]; then
     source /etc/lsb-release
 
@@ -83,6 +92,7 @@ if [ "$yn" = y ]; then
     fi
 fi
 
+# Get Vundle so we can install all the other plugins
 if [ ! -d ./bundle/Vundle.vim ]; then
     git clone https://github.com/VundleVim/Vundle.vim.git bundle/Vundle.vim
     if [ $? -ne 0 ]; then
@@ -101,22 +111,28 @@ if [ "$CONFIG" = nocompile ]; then
 fi
 
 if ! which cmake; then
-    echo "install cmake"
+    echo "Please install cmake"
     exit 1
 fi
 
-read -p "Install llvm6+clang6 via apt [y/n]?" yn
+read -p "Install llvm6+clang6 (Works best for YCM+ColorCoded) via apt [y/n]?" yn
 if [ "$yn" = y ]; then
     sudo apt install -y llvm-6.0 llvm-6.0-dev clang-6.0 libclang-6.0-dev
+fi
+
+read -p "Install libncurses zlib via apt (Required) [y/n]?" yn
+if [ "$yn" = y ]; then
+    sudo apt install libncurses[0-9]-dev zlib1g-dev zlib1g
 fi
 
 if [ -d ./bundle/color_coded ]; then
     cd ./bundle/color_coded
     # Add support for llvm-6.0
     git apply "$ROOT_DIR"/color_coded_llvm_6.diff
+    rm -rf build
     mkdir build
     cd build
-    # Let cmake find llvm-config
+    # enable verbose incase something fails
     cmake -DDOWNLOAD_CLANG=0 -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_VERBOSE_MAKEFILE=1 .. && \
     make -j$(nproc) && \
@@ -154,3 +170,6 @@ else
     echo "YouCompleteMe failed to download"
     exit 1
 fi
+
+echo "Everything was completed successfully!"
+exit 0
