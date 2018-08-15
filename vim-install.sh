@@ -63,7 +63,7 @@ do_apt_packages() {
     sudo apt install "${UBUNTU1604_APT_PKGS[@]}"
 
     if [ $? -ne 0 ]; then
-        echo "Failed to do apt install $VER"
+        echo "Failed to do apt install"
         exit 1
     fi
 }
