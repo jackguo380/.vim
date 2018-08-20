@@ -67,6 +67,9 @@ Plugin 'bfrg/vim-cpp-modern'
 " Auto Update Gtags
 "Plugin 'skywind3000/gutentags_plus'
 
+" Markdown Preview
+Plugin 'iamcco/markdown-preview.vim'
+
 call vundle#end()
 " -- End of Vundle configuration --
 
