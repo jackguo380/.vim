@@ -21,6 +21,7 @@ hi Normal ctermbg=none
 let python_highlight_all=1
 
 " bold the cursor line
-set cursorline
+"set cursorline
+set nocursorline " Need to disable this until https://github.com/vim/vim/issues/2584 is fixed
 hi CursorLine term=bold cterm=bold
 hi CursorLineNr term=bold cterm=bold ctermbg=black

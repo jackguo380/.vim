@@ -6,7 +6,7 @@ MYNAME="Jack Guo"
 REPO=https://github.com/vim/vim.git
 # Version to checkout
 # vim's master branch isn't too stable so its good use a known working version
-VER=v8.0.1850
+VER=v8.1.0301
 
 # -- Compilation --
 VIM_RUNTIME_DIR=/usr/local/share/vim/vim80

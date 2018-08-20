@@ -1,4 +1,4 @@
-! bundle/Vundle.vim
 bundle/*
 .netrwhist
 .config.txt
+*.swp
