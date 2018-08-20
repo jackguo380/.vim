@@ -47,6 +47,8 @@ inoremap jj <Esc>
 " Code folding with space bar
 nnoremap <space> za
 
+let mapleader = "\\"
+
 "Buffer KeyBind \l
 nnoremap <leader>l :ls<CR>:b<space>
 
