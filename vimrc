@@ -12,7 +12,6 @@ source ~/.vim/vimrcs/vundle.vimrc
 filetype plugin indent on
 
 source ~/.vim/vimrcs/airline.vimrc
-source ~/.vim/vimrcs/conque.vimrc
 source ~/.vim/vimrcs/cscope-extra.vimrc
 source ~/.vim/vimrcs/matchit.vimrc
 source ~/.vim/vimrcs/vundle.vimrc

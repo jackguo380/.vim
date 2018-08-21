@@ -19,6 +19,14 @@ if executable($HOME . "/.vim/cquery/build/release/bin/cquery")
       \ })
 endif
 
+nmap csfg :LspDefinition<CR>
+nmap csfc :LspReferences<CR>
+nmap csfs :LspReferences<CR>
+nmap csfi :LspImplementation<CR>
+nmap csft :LspTypeDefinition<CR>
+nmap csfh :LspHover<CR>
+nmap csfr :LspRename<CR>
+
 " Debug Logging
 "let g:lsp_log_verbose = 1
 "let g:lsp_log_file = expand('~/vim-lsp.log')
