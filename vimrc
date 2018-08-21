@@ -20,6 +20,7 @@ source ~/.vim/vimrcs/ycm.vimrc
 source ~/.vim/vimrcs/gtags.vimrc
 source ~/.vim/vimrcs/regexhelpers.vimrc
 source ~/.vim/vimrcs/ctrlp.vimrc
+source ~/.vim/vimrcs/cquery.vimrc
 
 syntax on
 set autoindent

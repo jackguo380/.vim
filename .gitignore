@@ -2,3 +2,4 @@ bundle/*
 .netrwhist
 .config.txt
 *.swp
+cquery

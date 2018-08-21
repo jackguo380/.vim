@@ -132,11 +132,10 @@ if [ -d ./bundle/color_coded ]; then
     rm -rf build
     mkdir build
     cd build
-    # enable verbose incase something fails
-    cmake -DDOWNLOAD_CLANG=0 -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_VERBOSE_MAKEFILE=1 .. && \
-    make -j$(nproc) && \
-    make install
+
+    cmake -DDOWNLOAD_CLANG=0 -DCMAKE_BUILD_TYPE=Release .. &&
+        make -j$(nproc) && make install
+
     if [ $? -ne 0 ]; then
         echo "Failed to build color coded"
         exit 1
@@ -160,7 +159,7 @@ if [ -d ./bundle/YouCompleteMe ]; then
 
     cd "$ROOT_DIR"/bundle/YouCompleteMe
 
-    EXTRA_CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1" \
+    EXTRA_CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release" \
         ./install.py --clang-completer --system-libclang
     if [ $? -ne 0 ]; then
         echo "Failed to build YouCompleteMe"
@@ -168,6 +167,37 @@ if [ -d ./bundle/YouCompleteMe ]; then
     fi
 else
     echo "YouCompleteMe failed to download"
+    exit 1
+fi
+
+cd "$ROOT_DIR"
+
+# CQuery
+if [ ! -d cquery ]; then
+    if ! git clone https://github.com/cquery-project/cquery.git --recursive cquery; then
+        echo "failed to clone cquery"
+        exit 1
+    fi
+fi
+
+cd cquery
+
+if ! git pull && git submodule update --init; then
+    echo "failed to update cquery"
+    exit 1
+fi
+
+if [ -d build ]; then
+    rm -rf build
+fi
+
+mkdir build && cd build
+
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release &&
+    cmake --build . && cmake --build . --target install
+
+if [ $? -ne 0 ]; then
+    echo "Failed to build cquery"
     exit 1
 fi
 
