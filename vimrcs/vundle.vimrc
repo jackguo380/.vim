@@ -29,6 +29,9 @@ endif
 " eldar color scheme
 Plugin 'agude/vim-eldar'
 
+" file explorer
+Plugin 'scrooloose/nerdtree'
+
 "gdb integration for vim
 "Plugin 'vim-scripts/Conque-GDB'
 

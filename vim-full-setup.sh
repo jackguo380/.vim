@@ -194,7 +194,7 @@ fi
 mkdir build && cd build
 
 cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release &&
-    cmake --build . && cmake --build . --target install
+    make -j$(nproc) && make install
 
 if [ $? -ne 0 ]; then
     echo "Failed to build cquery"
