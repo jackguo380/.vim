@@ -3,23 +3,48 @@ set encoding=utf-8
 
 if filereadable($HOME . "/.vim/.config.txt")
     let my_config = readfile($HOME . "/.vim/.config.txt")[0]
+
+    if ! ( my_config ==# "all" || my_config ==# "nocompile" || my_config ==# "asyncomplete" )
+        echoerr "Bad Vimrc Configuration: " . my_config
+        let my_config = "nocompile"
+    endif
 else
-    let my_config = "all"
+    echoerr "No Vimrc Configuration Found!"
+    let my_config = "nocompile"
 endif
 
-source ~/.vim/vimrcs/vundle.vimrc
+""echom "Vimrc Configuration: " . my_config
+
+if my_config ==# "all"
+    let config_use_ycm = 1
+    let config_use_color_coded = 1
+    let config_use_asyncomplete = 1
+    let config_use_cquery = 1
+elseif my_config ==# "nocompile"
+    let config_use_ycm = 0
+    let config_use_color_coded = 0
+    let config_use_asyncomplete = 0
+    let config_use_cquery = 0
+elseif my_config ==# "asyncomplete"
+    let config_use_ycm = 0
+    let config_use_color_coded = 1
+    let config_use_asyncomplete = 1
+    let config_use_cquery = 1
+endif
+
+source ~/.vim/vimrcs/plugins.vimrc
 
 filetype plugin indent on
 
 source ~/.vim/vimrcs/airline.vimrc
 source ~/.vim/vimrcs/cscope-extra.vimrc
 source ~/.vim/vimrcs/matchit.vimrc
-source ~/.vim/vimrcs/vundle.vimrc
 source ~/.vim/vimrcs/ycm.vimrc
 source ~/.vim/vimrcs/gtags.vimrc
 source ~/.vim/vimrcs/regexhelpers.vimrc
 source ~/.vim/vimrcs/ctrlp.vimrc
-source ~/.vim/vimrcs/cquery.vimrc
+source ~/.vim/vimrcs/language_servers.vimrc
+source ~/.vim/vimrcs/asyncomplete.vimrc
 
 syntax on
 set autoindent

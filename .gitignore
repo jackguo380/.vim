@@ -3,3 +3,4 @@ bundle/*
 .config.txt
 *.swp
 cquery
+autoload/plug.vim
