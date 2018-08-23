@@ -1,8 +1,14 @@
 set nocompatible
 set encoding=utf-8
 
-if filereadable($HOME . "/.vim/.config.txt")
-    let my_config = readfile($HOME . "/.vim/.config.txt")[0]
+if has('win32') || has ('win64')
+    let $VIMHOME = $VIM."/vimfiles"
+else
+    let $VIMHOME = $HOME."/.vim"
+endif
+
+if filereadable($VIMHOME . "/.config.txt")
+    let my_config = readfile($VIMHOME . "/.config.txt")[0]
 
     if ! ( my_config ==# "all" || my_config ==# "nocompile" || my_config ==# "asyncomplete" )
         echoerr "Bad Vimrc Configuration: " . my_config
@@ -13,12 +19,10 @@ else
     let my_config = "nocompile"
 endif
 
-""echom "Vimrc Configuration: " . my_config
-
 if my_config ==# "all"
     let config_use_ycm = 1
     let config_use_color_coded = 1
-    let config_use_asyncomplete = 1
+    let config_use_asyncomplete = 0
     let config_use_cquery = 1
 elseif my_config ==# "nocompile"
     let config_use_ycm = 0
@@ -35,10 +39,10 @@ endif
 source ~/.vim/vimrcs/plugins.vimrc
 
 filetype plugin indent on
+syntax on
 
 source ~/.vim/vimrcs/airline.vimrc
 source ~/.vim/vimrcs/cscope-extra.vimrc
-source ~/.vim/vimrcs/matchit.vimrc
 source ~/.vim/vimrcs/ycm.vimrc
 source ~/.vim/vimrcs/gtags.vimrc
 source ~/.vim/vimrcs/regexhelpers.vimrc
@@ -46,23 +50,26 @@ source ~/.vim/vimrcs/ctrlp.vimrc
 source ~/.vim/vimrcs/language_servers.vimrc
 source ~/.vim/vimrcs/asyncomplete.vimrc
 
-syntax on
-set autoindent
-set ts=4
-set backspace=indent,eol,start "Backspace fix
-set ignorecase
+" TODO: remove commented out settings after testing sensible.vim
+"set autoindent
+" Backspace fix
+"set backspace=indent,eol,start
+" Search case sensitivity
 set smartcase
+" Highlight search items
 set hlsearch
-set modelines=0
-set wildmenu
+" Better completion in command mode
+"set wildmenu
 set wildmode=longest:full
-set nu "line numbers
+" Line numbers
+set nu
 " Use 4 spaces rather than tabs
-set tabstop=4
-set shiftwidth=4
-set softtabstop=4
-set expandtab
-set smarttab
+"set ts=4
+"set tabstop=4
+"set shiftwidth=4
+"set softtabstop=4
+"set expandtab
+"set smarttab
 
 let c_space_errors=1
 
@@ -72,7 +79,7 @@ inoremap jj <Esc>
 " Code folding with space bar
 nnoremap <space> za
 
-let mapleader = "\\"
+let mapleader = ","
 
 "Buffer KeyBind \l
 nnoremap <leader>l :ls<CR>:b<space>
@@ -84,4 +91,5 @@ let g:netrw_liststyle = 3 " Use the nice tree style listing
 
 source ~/.vim/vimrcs/colorscheme.vimrc
 
+" Allow .vimrc files in other folders as a local configuration
 set exrc secure

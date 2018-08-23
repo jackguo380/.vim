@@ -5,6 +5,11 @@ if ! which git; then
     exit 1
 fi
 
+if ! which curl; then
+    echo "Please install curl"
+    exit 1
+fi
+
 if [ "$(realpath --relative-to "$HOME" .)" != .vim ]; then
     echo "Execute this script in the .vim directory"
     exit 1
@@ -97,19 +102,28 @@ if [ "$yn" = y ]; then
     fi
 fi
 
-# Get Vundle so we can install all the other plugins
-if [ ! -d ./bundle/Vundle.vim ]; then
-    git clone https://github.com/VundleVim/Vundle.vim.git bundle/Vundle.vim
+if [ ! -f autoload/plug.vim ]; then
+    curl -fLo autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     if [ $? -ne 0 ]; then
-        echo "Failed to download vundle"
+        echo "Failed to download vim-plug"
         exit 1
     fi
 fi
 
+## Get Vundle so we can install all the other plugins
+#if [ ! -d ./bundle/Vundle.vim ]; then
+#    git clone https://github.com/VundleVim/Vundle.vim.git bundle/Vundle.vim
+#    if [ $? -ne 0 ]; then
+#        echo "Failed to download vundle"
+#        exit 1
+#    fi
+#fi
+
 cd "$ROOT_DIR"
 
 # Run vundle to configure all plugins, ignore the errors from this
-vim +PluginInstall! +qall
+vim +PlugUpdate +qall
 
 if [ "$CONFIG" = nocompile ]; then
     echo "Everything done for configuration: nocompile"
@@ -145,6 +159,12 @@ if ! git pull && git submodule update --init; then
     exit 1
 fi
 
+git reset --hard
+
+# CQuery seems to download LLVM for ubuntu 14.04 when compiling for 18.04
+# LLVM doesn't have an official 18.04 but 16.04 should be better
+git apply "$ROOT_DIR"/cquery_fix_llvm_ver.diff
+
 rm -rf build
 mkdir build
 cd build
@@ -172,6 +192,7 @@ fi
 if [ -d ./bundle/color_coded ]; then
     cd ./bundle/color_coded
     # Add support for llvm-6.0
+    git reset --hard
     git apply "$ROOT_DIR"/color_coded_llvm_6.diff
     rm -rf build
     mkdir build
@@ -186,16 +207,20 @@ if [ -d ./bundle/color_coded ]; then
         exit 1
     fi
     rm ./* -r
-else
-    echo "color coded failed to download"
-    exit 1
 fi
 
 cd "$ROOT_DIR"
 
+# Skip YCM for asyncomplete
+if [ "$CONFIG" = asyncomplete ]; then
+    echo "Everything done for config: asyncomplete"
+    exit 0
+fi
+
 # YouCompleteMe
 if [ -d ./bundle/YouCompleteMe ]; then
     cd ./bundle/YouCompleteMe
+    git reset --hard
 
     rm -rf build
     mkdir build
@@ -222,9 +247,6 @@ if [ -d ./bundle/YouCompleteMe ]; then
         echo "Failed to build cregex for ycm"
         exit 1
     fi
-else
-    echo "YouCompleteMe failed to download"
-    exit 1
 fi
 
 echo "Everything was completed successfully!"

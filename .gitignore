@@ -4,3 +4,6 @@ bundle/*
 *.swp
 cquery
 autoload/plug.vim
+indent/cmake.vim
+syntax/cmake.vim
+plugin/gitignore.vim

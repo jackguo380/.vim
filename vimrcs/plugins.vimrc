@@ -1,27 +1,22 @@
-filetype off
-
 call plug#begin('~/.vim/bundle')
-"set rtp+=~/.vim/bundle/Vundle.vim
-"call vundle#begin()
 
-" let Vundle manage Vundle, required
-" Plug 'VundleVim/Vundle.vim' "Plugin Manager
+Plug 'junegunn/vim-plug'
+
+" Various useful configurations
+Plug 'tpope/vim-sensible'
 
 if config_use_ycm
-    "" Smart text/code completion, needs to be compiled
-    "Plug 'Valloric/YouCompleteMe' 
+    " Smart text/code completion, needs to be compiled
+    Plug 'Valloric/YouCompleteMe' 
 
-    "" YCM config generator
-    "Plug 'rdnetto/YCM-Generator'
+    " YCM config generator
+    Plug 'rdnetto/YCM-Generator'
 endif
 
 if config_use_color_coded
     " Better C++ highlighting, also needs to be compiled
     Plug 'jeaye/color_coded'
 endif
-
-" Vimscript only completion system
-Plug 'prabirshrestha/asyncomplete.vim'
 
 " Async helpers, used for asyncomplete, vim-lsp, ..
 " Does nothing on its own
@@ -30,15 +25,19 @@ Plug 'prabirshrestha/async.vim'
 " Language server support
 Plug 'prabirshrestha/vim-lsp'
 
-"if config_use_asyncomplete
-   " Add language servers to asyncomplete
-   Plug 'prabirshrestha/asyncomplete-lsp.vim'
+if config_use_asyncomplete
+    " Vimscript only completion system
+    Plug 'prabirshrestha/asyncomplete.vim'
 
-   " File completions
-   Plug 'prabirshrestha/asyncomplete-file.vim'
+    " Add language servers to asyncomplete
+    Plug 'prabirshrestha/asyncomplete-lsp.vim'
 
-   Plug 'prabirshrestha/asyncomplete-buffer.vim'
-"endif
+    " File completions
+    Plug 'prabirshrestha/asyncomplete-file.vim'
+
+    " Words in Buffer
+    Plug 'prabirshrestha/asyncomplete-buffer.vim'
+endif
 
 if config_use_cquery
     " Language server extension for CQuery
@@ -50,6 +49,9 @@ Plug 'agude/vim-eldar'
 
 " file explorer
 Plug 'scrooloose/nerdtree'
+
+" automatic tab width
+Plug 'tpope/vim-sleuth'
 
 " Status Bar
 Plug 'vim-airline/vim-airline'
@@ -85,5 +87,26 @@ Plug 'bfrg/vim-cpp-modern'
 Plug 'iamcco/markdown-preview.vim'
 
 call plug#end()
-"call vundle#end()
+
+" Some extra non-github plugins
+function! s:curl_plugin(name, url)
+    let curl_opts = "--create-dirs -fLo"
+    let full_name = $VIMHOME . '/' . substitute(substitute(a:name, "['\"]$", "", ""), "^[\"']", "", "")
+
+    if ! filereadable(full_name)
+	exe "!echo CurlPlug: Downloading: " . a:name
+	exe "!curl" curl_opts full_name a:url 
+	exe "!echo CurlPlug: Done Downloading: " . a:name
+    endif
+endfunction
+command -nargs=+ CurlPlug silent call s:curl_plugin(<f-args>)
+
+" Set wildignore from gitignore
+CurlPlug 'plugin/gitignore.vim' 'https://www.vim.org/scripts/download_script.php?src_id=25252'
+
+" CMake syntax
+CurlPlug "syntax/cmake.vim" 'https://raw.githubusercontent.com/Kitware/CMake/master/Auxiliary/vim/syntax/cmake.vim'
+
+" CMake indent
+CurlPlug 'indent/cmake.vim' 'https://raw.githubusercontent.com/Kitware/CMake/master/Auxiliary/vim/indent/cmake.vim'
 

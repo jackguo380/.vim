@@ -18,19 +18,30 @@ endif
 if config_use_cquery
     function! FindCqueryProjectRoot()
         let cph = expand('%:p:h', 1)
-        if cph =~ '^.\+://' | retu cph | en
+        let wdlist = []
+
+        " Comparing path's string length is good enough since we search upwards only
+        func! s:comparelens(s1, s2)
+            return len(a:s1) < len(a:s2) ? 1 : -1
+        endfunc
+
         for mkr in ['.git/', 'compile_commands.json', '.ctrlp', '.cquery', '.color_coded', '.ycm_extra_conf.py', '.vimprojects']
             let wd = call('find'.(mkr =~ '/$' ? 'dir' : 'file'), [mkr, cph.';'])
-            if wd != '' | brea | en
+            if wd != '' 
+                let wd = wd =~ '^/' ? wd : getcwd() . '/' . wd " prepend full path if not already a full path
+                let wdlist += [wd]
+            endif
         endfo
-        let wd = fnameescape(wd == '' ? cph : substitute(wd, mkr.'$', '.', ''))
-        return wd =~ '^/' ? wd : getcwd() . '/' . wd
+
+        call sort(wdlist, function("s:comparelens"))
+        call uniq(wdlist)
+        return fnameescape(len(wdlist) == 0 ? cph : fnamemodify(wdlist[0], ":h"))
     endfunction
 
-    if executable($HOME . "/.vim/cquery/build/release/bin/cquery")
+    if executable($VIMHOME . "/cquery/build/release/bin/cquery")
         au User lsp_setup call lsp#register_server({
                     \ 'name': 'cquery',
-                    \ 'cmd': {server_info->[$HOME . "/.vim/cquery/build/release/bin/cquery"]},
+                    \ 'cmd': {server_info->[$VIMHOME . "/cquery/build/release/bin/cquery"]},
                     \ 'root_uri': {server_info->lsp#utils#path_to_uri(FindCqueryProjectRoot())},
                     \ 'initialization_options': { 'cacheDirectory': '/tmp/cquery/cache' },
                     \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
