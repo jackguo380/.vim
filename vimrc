@@ -10,7 +10,7 @@ endif
 if filereadable($VIMHOME . "/.config.txt")
     let my_config = readfile($VIMHOME . "/.config.txt")[0]
 
-    if ! ( my_config ==# "all" || my_config ==# "nocompile" || my_config ==# "asyncomplete" )
+    if ! ( my_config ==# "ycm" || my_config ==# "nocompile" || my_config ==# "asyncomplete" )
         echoerr "Bad Vimrc Configuration: " . my_config
         let my_config = "nocompile"
     endif
@@ -19,7 +19,7 @@ else
     let my_config = "nocompile"
 endif
 
-if my_config ==# "all"
+if my_config ==# "ycm"
     let config_use_ycm = 1
     let config_use_color_coded = 1
     let config_use_asyncomplete = 0

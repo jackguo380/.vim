@@ -102,7 +102,7 @@ endfunction
 command -nargs=+ CurlPlug silent call s:curl_plugin(<f-args>)
 
 " Set wildignore from gitignore
-CurlPlug 'plugin/gitignore.vim' 'https://www.vim.org/scripts/download_script.php?src_id=25252'
+"CurlPlug 'plugin/gitignore.vim' 'https://www.vim.org/scripts/download_script.php?src_id=25252'
 
 " CMake syntax
 CurlPlug "syntax/cmake.vim" 'https://raw.githubusercontent.com/Kitware/CMake/master/Auxiliary/vim/syntax/cmake.vim'

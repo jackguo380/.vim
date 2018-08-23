@@ -22,7 +22,7 @@ cat <<EOF
 Usage: $0 -c <config>
 -c <config>
 Configs:
-all - install all plugins
+ycm - use YCM instead of asyncomplete
 nocompile - install only vimscript plugins
 asyncomplete - use asyncomplete as a replacement for YCM
 
@@ -35,7 +35,7 @@ while getopts "c:h" opt; do
     case $opt in
         c)
             case "$OPTARG" in
-                all) ;;
+                ycm) ;;
                 nocompile) ;;
                 asyncomplete) ;;
                 *) echo "Invalid config: $OPTARG"; exit 1 ;;
@@ -61,9 +61,37 @@ echo "$CONFIG" > .config.txt
 
 read -p "Install vim [y/n]?" yn
 
+function download_llvm {
+    pushd "$ROOT_DIR"
+    if [ ! -f clang+llvm-6.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz ]; then
+        if ! wget https://releases.llvm.org/6.0.1/clang+llvm-6.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz; then
+            echo "failed to download LLVM"
+            exit 1
+        fi
+    fi
+    
+    if [ ! -d clang+llvm-6.0.1-x86_64-linux-gnu-ubuntu-16.04 ]; then
+        echo "Untarring LLVM..."
+        if ! tar -xf clang+llvm-6.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz; then
+            echo "failed to untar LLVM"
+            exit 1
+        fi
+    fi
+
+    llvm_dir="$ROOT_DIR"/clang+llvm-6.0.1-x86_64-linux-gnu-ubuntu-16.04
+    popd
+}
+
 function compile_install {
     echo "Compiling vim from Github repository"
     sleep 2
+
+    read -p "Use LLVM to compile vim [y/n]?" yn
+    if [ "$yn" = y ]; then
+        download_llvm
+        export USE_CLANG=true LLVM_DIR="$llvm_dir"
+    fi
+
     cd "$HOME" 
     if ! .vim/vim-install.sh; then
         echo "Failed to install vim"
@@ -140,6 +168,9 @@ if [ "$yn" = y ]; then
     sudo apt install libncurses[0-9]-dev zlib1g-dev zlib1g
 fi
 
+# Need llvm for pretty much all the compiled plugins
+download_llvm
+
 cd "$ROOT_DIR"
 
 # CQuery
@@ -159,17 +190,12 @@ if ! git pull && git submodule update --init; then
     exit 1
 fi
 
-git reset --hard
-
-# CQuery seems to download LLVM for ubuntu 14.04 when compiling for 18.04
-# LLVM doesn't have an official 18.04 but 16.04 should be better
-git apply "$ROOT_DIR"/cquery_fix_llvm_ver.diff
-
 rm -rf build
 mkdir build
 cd build
 
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release &&
+cmake .. -DCMAKE_PREFIX_PATH="$llvm_dir" -DSYSTEM_CLANG=1 \
+    -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release &&
     make -j$(nproc) && make install
 
 if [ $? -ne 0 ]; then
@@ -179,14 +205,6 @@ fi
 
 
 cd "$ROOT_DIR"
-
-llvm_dir="$(echo cquery/build/clang+llvm*.tar* )"
-llvm_dir="$ROOT_DIR/${llvm_dir/\.tar.*/}"
-
-if [ ! -d "$llvm_dir" ]; then
-    echo "Failed to find CQuery's LLVM Installalation: $llvm_dir"
-    exit 1
-fi
 
 # Color Coded
 if [ -d ./bundle/color_coded ]; then

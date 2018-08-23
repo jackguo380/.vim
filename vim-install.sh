@@ -9,12 +9,24 @@ REPO=https://github.com/vim/vim.git
 VER=v8.0.1453
 
 # -- Compilation --
-VIM_RUNTIME_DIR=/usr/local/share/vim/vim80
+if ${USE_CLANG:-false}; then
+    if [ ! -d "$LLVM_DIR" ]; then
+        echo "Cant use CLANG since its not downloaded"
+        exit 1
+    fi
+    # do all the optimization we can possibly do...
+    export CC="$LLVM_DIR/bin/clang" LDFLAGS="-fuse-ld=lld -O3 -flto" CFLAGS="-O3 -flto"
+else
+    export CFLAGS="-O3" 
+fi
+
+VIM_RUNTIME_DIR=/usr/local/share/vim/vim$(echo "$VER" | sed 's/v\([0-9]\)\.\([0-9]\).*/\1\2/')
 CONFIG_OPTS=(
     --enable-pythoninterp=yes 
     --enable-python3interp=yes 
     --enable-perlinterp=yes  
     --enable-luainterp=yes 
+    --enable-rubyinterp=yes
 #    --with-lua-prefix=/usr/local
     --enable-cscope 
     --enable-autoservername 
@@ -70,7 +82,7 @@ do_apt_packages() {
 
 do_configure() {
     make clean distclean
-    CFLAGS="-O3" CPPFLAGS="-O3" ./configure "${CONFIG_OPTS[@]}"
+    ./configure "${CONFIG_OPTS[@]}"
 
     if [ $? -ne 0 ]; then
         echo "Failed to configure Vim"
