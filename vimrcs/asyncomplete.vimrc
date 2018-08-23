@@ -23,4 +23,5 @@ if config_use_asyncomplete
                 \ }))
 
     let g:lsp_async_completion = 1
+    let g:asyncomplete_log_file = expand("/tmp/asyncomplete.log")
 endif

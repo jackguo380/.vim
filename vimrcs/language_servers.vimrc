@@ -38,10 +38,11 @@ if config_use_cquery
         return fnameescape(len(wdlist) == 0 ? cph : fnamemodify(wdlist[0], ":h"))
     endfunction
 
-    if executable($VIMHOME . "/cquery/build/release/bin/cquery")
+    let s:cquery_lang_server_executable = $VIMHOME . "/cquery/build/release/bin/cquery"
+    if executable(s:cquery_lang_server_executable)
         au User lsp_setup call lsp#register_server({
                     \ 'name': 'cquery',
-                    \ 'cmd': {server_info->[$VIMHOME . "/cquery/build/release/bin/cquery"]},
+                    \ 'cmd': {server_info->[s:cquery_lang_server_executable]},
                     \ 'root_uri': {server_info->lsp#utils#path_to_uri(FindCqueryProjectRoot())},
                     \ 'initialization_options': { 'cacheDirectory': '/tmp/cquery/cache' },
                     \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
@@ -58,5 +59,5 @@ if config_use_cquery
 
     " Debug Logging
     let g:lsp_log_verbose = 1
-    let g:lsp_log_file = expand('~/vim-lsp.log')
+    let g:lsp_log_file = expand('/tmp/vim-lsp.log')
 endif

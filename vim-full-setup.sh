@@ -194,7 +194,7 @@ rm -rf build
 mkdir build
 cd build
 
-cmake .. -DCMAKE_PREFIX_PATH="$llvm_dir" -DSYSTEM_CLANG=1 \
+cmake .. -DCMAKE_PREFIX_PATH="$llvm_dir" -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" -DSYSTEM_CLANG=1 \
     -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release &&
     make -j$(nproc) && make install
 
@@ -216,7 +216,7 @@ if [ -d ./bundle/color_coded ]; then
     mkdir build
     cd build
 
-    cmake -DDOWNLOAD_CLANG=0 -DCMAKE_BUILD_TYPE=Release \
+    cmake -DDOWNLOAD_CLANG=0 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" \
         -DLLVM_ROOT_DIR="$llvm_dir" .. &&
         make -j$(nproc) && make install
 
@@ -244,7 +244,8 @@ if [ -d ./bundle/YouCompleteMe ]; then
     mkdir build
     cd build
 
-    cmake -DCMAKE_BUILD_TYPE=Release -DPATH_TO_LLVM_ROOT="$llvm_dir" . \
+    cmake -DCMAKE_BUILD_TYPE=Release -DPATH_TO_LLVM_ROOT="$llvm_dir" \
+        -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" -DCMAKE_BUILD_RPATH="$llvm_dir/lib" . \
         "$ROOT_DIR"/bundle/YouCompleteMe/third_party/ycmd/cpp &&
         make -j$(nproc) ycm_core
     if [ $? -ne 0 ]; then

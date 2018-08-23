@@ -10,14 +10,17 @@ VER=v8.0.1453
 
 # -- Compilation --
 if ${USE_CLANG:-false}; then
+    LLVM_DIR="${LLVM_DIR:-$HOME/.vim/clang+llvm-6.0.1-x86_64-linux-gnu-ubuntu-16.04}"
     if [ ! -d "$LLVM_DIR" ]; then
         echo "Cant use CLANG since its not downloaded"
         exit 1
     fi
-    # do all the optimization we can possibly do...
-    export CC="$LLVM_DIR/bin/clang" LDFLAGS="-fuse-ld=lld -O3 -flto" CFLAGS="-O3 -flto"
-else
-    export CFLAGS="-O3" 
+    # Overkill optimizations...
+    export CC="$LLVM_DIR/bin/clang"
+    export CFLAGS="-O3 -flto=thin"
+    export LDFLAGS="-fuse-ld=lld -O3 -flto=thin -Wl,--lto-O3,--threads,--thinlto-jobs=$(nproc)"
+#else
+    #export CFLAGS="-O3" 
 fi
 
 VIM_RUNTIME_DIR=/usr/local/share/vim/vim$(echo "$VER" | sed 's/v\([0-9]\)\.\([0-9]\).*/\1\2/')
