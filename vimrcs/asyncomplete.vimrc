@@ -10,6 +10,7 @@ if config_use_asyncomplete
     let g:asyncomplete_smart_completion = 1
     set completeopt-=preview
 
+    " Filename completion
     au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
                 \ 'name': 'file',
                 \ 'whitelist': ['*'],
@@ -17,12 +18,23 @@ if config_use_asyncomplete
                 \ 'completor': function('asyncomplete#sources#file#completor')
                 \ }))
 
+    " Complete with words from buffer
     au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
                 \ 'name': 'buffer',
                 \ 'whitelist': ['*'],
-                \ 'blacklist': ['go', 'c', 'cpp', 'python', 'sh'],
+                \ 'priority' : 0,
+                \ 'blacklist': ['go', 'c', 'cpp', 'python', 'sh', 'vim'],
                 \ 'completor': function('asyncomplete#sources#buffer#completor'),
                 \ }))
+
+    " Completion for vim
+    au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#necovim#get_source_options({
+                \ 'name': 'necovim',
+                \ 'whitelist': ['vim'],
+                \ 'priority' : 20,
+                \ 'completor': function('asyncomplete#sources#necovim#completor'),
+                \ }))
+
 
     let g:lsp_async_completion = 1
     let g:asyncomplete_log_file = expand("/tmp/asyncomplete.log")

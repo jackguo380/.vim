@@ -37,6 +37,10 @@ if config_use_asyncomplete
 
     " Words in Buffer
     Plug 'prabirshrestha/asyncomplete-buffer.vim'
+
+    " Vimscript
+    Plug 'Shougo/neco-vim'
+    Plug 'prabirshrestha/asyncomplete-necovim.vim'
 endif
 
 if config_use_cquery

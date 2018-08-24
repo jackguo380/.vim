@@ -49,6 +49,7 @@ source ~/.vim/vimrcs/regexhelpers.vimrc
 source ~/.vim/vimrcs/ctrlp.vimrc
 source ~/.vim/vimrcs/language_servers.vimrc
 source ~/.vim/vimrcs/asyncomplete.vimrc
+source ~/.vim/vimrcs/misc_helpers.vimrc
 
 " TODO: remove commented out settings after testing sensible.vim
 "set autoindent
@@ -64,12 +65,14 @@ set wildmode=longest:full
 " Line numbers
 set nu
 " Use 4 spaces rather than tabs
-"set ts=4
-"set tabstop=4
-"set shiftwidth=4
-"set softtabstop=4
-"set expandtab
-"set smarttab
+" These settings only take effect if sleuth fails to detect
+set ts=4
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set expandtab
+set smarttab
+
 
 let c_space_errors=1
 
