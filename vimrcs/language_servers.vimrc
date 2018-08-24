@@ -1,3 +1,5 @@
+" Language servers
+
 if executable('bash-language-server')
   au User lsp_setup call lsp#register_server({
         \ 'name': 'bash-language-server',
