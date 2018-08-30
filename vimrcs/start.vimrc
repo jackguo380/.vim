@@ -1,3 +1,5 @@
+" Startup configuration
+
 function! FindProjectRoot()
     let cph = expand('%:p:h', 1)
     let wdlist = []
