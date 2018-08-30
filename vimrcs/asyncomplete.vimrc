@@ -23,7 +23,7 @@ if config_use_asyncomplete
                 \ 'name': 'buffer',
                 \ 'whitelist': ['*'],
                 \ 'priority' : 0,
-                \ 'blacklist': ['go', 'c', 'cpp', 'python', 'sh', 'vim'],
+                \ 'blacklist': ['go', 'c', 'cpp', 'python', 'vim'],
                 \ 'completor': function('asyncomplete#sources#buffer#completor'),
                 \ }))
 

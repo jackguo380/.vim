@@ -7,6 +7,8 @@ nmap csft :LspTypeDefinition<CR>
 nmap csfh :LspHover<CR>
 nmap csfr :LspRename<CR>
 
+nmap <leader>d :LspDocumentDiagnostics<CR>
+
 " Debug Logging
 let g:lsp_log_verbose = 1
 let g:lsp_log_file = expand('/tmp/vim-lsp.log')
@@ -37,35 +39,14 @@ if executable('pyls')
 endif
 
 if config_use_cquery
-    function! FindCqueryProjectRoot()
-        let cph = expand('%:p:h', 1)
-        let wdlist = []
-
-        " Comparing path's string length is good enough since we search upwards only
-        func! s:comparelens(s1, s2)
-            return len(a:s1) < len(a:s2) ? 1 : -1
-        endfunc
-
-        for mkr in ['.git/', 'compile_commands.json', '.ctrlp', '.cquery', '.color_coded', '.ycm_extra_conf.py', '.vimprojects']
-            let wd = call('find'.(mkr =~ '/$' ? 'dir' : 'file'), [mkr, cph.';'])
-            if wd != '' 
-                let wd = wd =~ '^/' ? wd : getcwd() . '/' . wd " prepend full path if not already a full path
-                let wdlist += [wd]
-            endif
-        endfo
-
-        call sort(wdlist, function("s:comparelens"))
-        call uniq(wdlist)
-        return fnameescape(len(wdlist) == 0 ? cph : fnamemodify(wdlist[0], ":h"))
-    endfunction
-
     let s:cquery_lang_server_executable = $VIMHOME . "/cquery/build/release/bin/cquery"
+    let s:cquery_root_dir = FindProjectRoot()
     if executable(s:cquery_lang_server_executable)
         au User lsp_setup call lsp#register_server({
                     \ 'name': 'cquery',
                     \ 'cmd': {server_info->[s:cquery_lang_server_executable]},
-                    \ 'root_uri': {server_info->lsp#utils#path_to_uri(FindCqueryProjectRoot())},
-                    \ 'initialization_options': { 'cacheDirectory': '/tmp/cquery/cache' },
+                    \ 'root_uri': {server_info->lsp#utils#path_to_uri(s:cquery_root_dir)},
+                    \ 'initialization_options': { 'cacheDirectory': s:cquery_root_dir . '/.cquery_cache' },
                     \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
                     \ })
     endif
