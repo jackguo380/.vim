@@ -24,6 +24,7 @@ Usage: $0 -c <config>
 Configs:
 ycm - use YCM instead of asyncomplete
 nocompile - install only vimscript plugins
+windows - only stuff that works in windows, (currently an alias for nocompile)
 asyncomplete - use asyncomplete as a replacement for YCM
 
 EOF
@@ -35,12 +36,12 @@ while getopts "c:h" opt; do
     case $opt in
         c)
             case "$OPTARG" in
-                ycm) ;;
-                nocompile) ;;
-                asyncomplete) ;;
+                ycm) CONFIG="$OPTARG" ;;
+                nocompile) CONFIG="$OPTARG" ;;
+                windows) CONFIG="nocompile" ;;
+                asyncomplete) CONFIG="$OPTARG" ;;
                 *) echo "Invalid config: $OPTARG"; exit 1 ;;
             esac
-            CONFIG="$OPTARG"
             ;;
         h)
             usage
