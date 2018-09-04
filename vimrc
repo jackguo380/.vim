@@ -2,7 +2,7 @@ set nocompatible
 set encoding=utf-8
 
 if has('win32') || has ('win64')
-    let $VIMHOME = $VIM."/vimfiles"
+    let $VIMHOME = $HOME."/vimfiles"
 else
     let $VIMHOME = $HOME."/.vim"
 endif
@@ -64,7 +64,7 @@ let g:netrw_banner = 0 "remove banner
 "let g:netrw_browse_split = 2
 let g:netrw_liststyle = 3 " Use the nice tree style listing
 
-source ~/.vim/vimrcs/colorscheme.vimrc
+source $VIMHOME/vimrcs/colorscheme.vimrc
 
 " Allow .vimrc files in other folders as a local configuration
 set exrc secure

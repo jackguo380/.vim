@@ -11,13 +11,7 @@ function! FindProjectRoot()
 
     for mkr in ['.git/', 'compile_commands.json', '.ctrlp', '.cquery', '.color_coded', '.ycm_extra_conf.py', '.vimprojects']
         let wd = call('find'.(mkr =~ '/$' ? 'dir' : 'file'), [mkr, cph.';'])
-        if wd != '' 
-            " Remove trailing / for directories
-            let wd = substitute(wd, '/$', '', '')
-            " prepend full path if not already a full path
-            let wd = wd =~ '^/' ? wd : getcwd() . '/' . wd
-            let wdlist += [fnamemodify(wd, ":h")]
-        endif
+        if wd != '' | let wdlist += [fnamemodify(wd, ":p:h")] | endif
     endfo
 
     " Find the longest path length

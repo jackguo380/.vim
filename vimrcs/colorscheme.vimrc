@@ -35,3 +35,9 @@ hi CursorLineNr term=bold cterm=bold ctermbg=black
 "  echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
 "endfunc
 "command! GetHLGroup call <SID>GetHLGroupF()
+
+if has("gui_running")
+    if has("gui_win32")
+        set guifont=Consolas:h10
+    endif
+endif
