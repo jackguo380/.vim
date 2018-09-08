@@ -17,7 +17,6 @@ let mapleader = ","
 source $VIMHOME/vimrcs/airline.vimrc
 source $VIMHOME/vimrcs/cscope-extra.vimrc
 source $VIMHOME/vimrcs/ycm.vimrc
-source $VIMHOME/vimrcs/gtags.vimrc
 source $VIMHOME/vimrcs/regexhelpers.vimrc
 source $VIMHOME/vimrcs/ctrlp.vimrc
 source $VIMHOME/vimrcs/language_servers.vimrc

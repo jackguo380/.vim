@@ -16,6 +16,8 @@ let g:lsp_log_file = expand('/tmp/vim-lsp.log')
 " Enable diagnostic signs
 "let g:lsp_signs_enabled = 0 Disabled until its a bit less annoying
 let g:lsp_diagnostics_echo_cursor = 1
+" Only use lsp diagnostics if YCM is disabled
+au FileType c,cpp let g:lsp_diagnostics_echo_cursor = ! config_use_ycm
 
 let g:lsp_signs_error = {'text': '✘'}
 let g:lsp_signs_warning = {'text': '‼'}
