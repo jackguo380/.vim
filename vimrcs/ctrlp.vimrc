@@ -3,19 +3,19 @@ let g:ctrlp_clear_cache_on_exit = 0
 
 let g:ctrlp_root_markers = ['compile_commands.json', '.ctrlp', '.cquery', '.color_coded', '.ycm_extra_conf.py', '.vimprojects']
 
-let ignore_files = ["*.so", "*.d", "*.o", "*.out", "*.old", ".swp", "*.gcda", "*.gcno", "*.dat"]
-let ignore_files_2 = []
+let s:ignore_files = ["*.so", "*.d", "*.o", "*.out", "*.old", ".swp", "*.gcda", "*.gcno", "*.dat"]
+let s:ignore_files_2 = []
 
-for val in ignore_files
+for val in s:ignore_files
     let val = substitute(val, "\*", "", "g")
     let val = substitute(val, "\\.", '\\.', "g")
     let val = val . '$'
-    let ignore_files_2 += [ val ]
+    let s:ignore_files_2 += [ val ]
 endfor
 
 let g:ctrlp_custom_ignore = {
   \ 'dir':  '\.git$',
-  \ 'file': join(ignore_files_2, '\|')
+  \ 'file': join(s:ignore_files_2, '\|')
   \ }
 
 

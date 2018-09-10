@@ -1,4 +1,8 @@
 " nerdtree config
+let NERDTreeShowHidden=1
+let NERDTreeQuitOnOpen=1
+
+let NERDTreeIgnore=['\~$', '\.d$', '\.o$', '\.out$', '\.gcda$', '\.gcno$']
 
 nmap <leader>no :NERDTreeToggle<CR>
 nmap <leader>nf :NERDTreeFocus<CR>
