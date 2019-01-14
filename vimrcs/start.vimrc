@@ -9,7 +9,7 @@ function! FindProjectRoot()
         return len(a:s1) < len(a:s2) ? 1 : -1
     endfunc
 
-    for mkr in ['.git/', 'compile_commands.json', '.ctrlp', '.cquery', '.color_coded', '.ycm_extra_conf.py', '.vimprojects']
+    for mkr in ['.git/', '.hg/', 'compile_commands.json', '.ctrlp', '.cquery', '.color_coded', '.ycm_extra_conf.py', '.vimprojects']
         let isdir = mkr =~ '/$'
         let wd = call('find'.(isdir ? 'dir' : 'file'), [mkr, cph.';'])
 

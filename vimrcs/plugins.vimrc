@@ -2,6 +2,9 @@ call plug#begin('~/.vim/bundle')
 
 Plug 'junegunn/vim-plug'
 
+" Auto spacing
+Plug 'tpope/vim-sleuth'
+
 " Various useful configurations
 Plug 'tpope/vim-sensible'
 
@@ -15,7 +18,7 @@ endif
 
 if config_use_color_coded
     " Better C++ highlighting, also needs to be compiled
-    Plug 'jeaye/color_coded'
+    "Plug 'jeaye/color_coded'
 endif
 
 " Async helpers, used for asyncomplete, vim-lsp, ..
@@ -68,6 +71,9 @@ Plug 'vim-airline/vim-airline-themes'
 
 " Git Integration
 Plug 'tpope/vim-fugitive'
+
+" Mercurial Integration
+Plug 'jlfwong/vim-mercenary'
 
 " Python folding
 "Plug 'tmhedberg/SimpylFold'
