@@ -18,7 +18,7 @@ endif
 
 if config_use_color_coded
     " Better C++ highlighting, also needs to be compiled
-    "Plug 'jeaye/color_coded'
+    Plug 'jeaye/color_coded'
 endif
 
 " Async helpers, used for asyncomplete, vim-lsp, ..

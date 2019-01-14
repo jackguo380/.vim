@@ -31,21 +31,27 @@
 from distutils.sysconfig import get_python_inc
 import platform
 import os
+import re
 import ycm_core
 
 # These are the compilation flags that will be used in case there's no
 # compilation database set (by default, one is not set).
 # CHANGE THIS LIST OF FLAGS. YES, THIS IS THE DROID YOU HAVE BEEN LOOKING FOR.
+cflags = [
+'-std=c11',
+]
+
+cxxflags = [
+'-std=gnu++14',
+]
+
 flags = [
-'-std=gnu++11',
 '-Wall',
 '-Wextra',
 '-Werror',
 '-Wno-long-long',
 '-Wno-variadic-macros',
 '-fexceptions',
-'-x',
-'c++',
 '-I',
 '.',
 ]
@@ -90,15 +96,15 @@ def FindCorrespondingSourceFile( filename ):
 
 
 def FlagsForFile( filename, **kwargs ):
-  # If the file is a header, try to find the corresponding source file and
-  # retrieve its flags from the compilation database if using one. This is
-  # necessary since compilation databases don't have entries for header files.
-  # In addition, use this source file as the translation unit. This makes it
-  # possible to jump from a declaration in the header file to its definition in
-  # the corresponding source file.
-  filename = FindCorrespondingSourceFile( filename )
-
   if not database:
+    curflags = flags
+
+    extension = os.path.splitext( filename )[ 1 ]
+    if extension == '.c':
+      curflags += cflags
+    else:
+      curflags += cxxflags
+
     return {
       'flags': flags,
       'include_paths_relative_to_dir': DirectoryOfThisScript(),
@@ -106,8 +112,19 @@ def FlagsForFile( filename, **kwargs ):
     }
 
   compilation_info = database.GetCompilationInfoForFile( filename )
+
   if not compilation_info.compiler_flags_:
-    return None
+    # If the file was a header it may not have info
+    # Retry with the corresponding source file
+    filename = FindCorrespondingSourceFile( filename )
+    compilation_info = database.GetCompilationInfoForFile( filename )
+
+    if not compilation_info.compiler_flags_:
+      return {
+        'flags': flags,
+        'include_paths_relative_to_dir': DirectoryOfThisScript(),
+        'override_filename': filename
+      }
 
   # Bear in mind that compilation_info.compiler_flags_ does NOT return a
   # python list, but a "list-like" StringVec object.

@@ -18,6 +18,8 @@ fi
 ROOT_DIR="$PWD"
 LLVM_VER=clang+llvm-7.0.0-x86_64-linux-gnu-ubuntu-16.04
 LLVM_URL=http://releases.llvm.org/7.0.0/$LLVM_VER.tar.xz
+LLVM6_VER=clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04
+LLVM6_URL=http://releases.llvm.org/6.0.0/$LLVM6_VER.tar.xz
 
 function usage {
 cat <<EOF
@@ -72,6 +74,13 @@ function download_llvm {
             exit 1
         fi
     fi
+
+    if [ ! -f $LLVM6_VER.tar.xz ]; then
+        if ! wget $LLVM6_URL; then
+            echo "failed to download LLVM6"
+            exit 1
+        fi
+    fi
     
     if [ ! -d $LLVM_VER ]; then
         echo "Untarring LLVM..."
@@ -81,7 +90,16 @@ function download_llvm {
         fi
     fi
 
+    if [ ! -d $LLVM6_VER ]; then
+        echo "Untarring LLVM..."
+        if ! tar -xf $LLVM6_VER.tar.xz; then
+            echo "failed to untar LLVM6"
+            exit 1
+        fi
+    fi
+
     llvm_dir="$ROOT_DIR"/$LLVM_VER
+    llvm6_dir="$ROOT_DIR"/$LLVM6_VER
     popd
 }
 
@@ -219,15 +237,13 @@ cd "$ROOT_DIR"
 # Color Coded
 if [ -d ./bundle/color_coded ]; then
     cd ./bundle/color_coded
-    # Add support for llvm-6.0
-    git reset --hard
-    git apply "$ROOT_DIR"/color_coded_llvm_6.diff
     rm -rf build
     mkdir build
     cd build
 
-    cmake -DDOWNLOAD_CLANG=0 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" \
-        -DLLVM_ROOT_DIR="$llvm_dir" "${ccache_args[@]}" .. &&
+    # Use llvm 6 for color coded
+    cmake -DDOWNLOAD_CLANG=0 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_RPATH="$llvm6_dir/lib" \
+        -DLLVM_ROOT_DIR="$llvm6_dir" "${ccache_args[@]}" .. &&
         make -j$(nproc) && make install
 
     if [ $? -ne 0 ]; then

@@ -6,6 +6,15 @@ use JSON;
 use Getopt::Long;
 use Term::ANSIColor;
 
+my $COMMANDS = "
+help    - get help for a specific command
+addflag - add a compile flag to the database
+rmflag  - remove a compile flag from the database
+lsflag  - lookup flags matching a regex
+abspath - make flags with paths absolute
+join    - join multiple compile databases together
+";
+
 if(not @ARGV) {
     usage();
     exit 1;
@@ -39,12 +48,7 @@ Usage:
 compiledbtool.pl <command> [<args to command..>]
 
 Commands:
-help    - get help for a specific command
-addflag - add a compile flag to the database
-rmflag  - remove a compile flag from the database
-lsflag  - lookup flags matching a regex
-abspath - make flags with paths absolute
-join    - join multiple compile databases together
+$COMMANDS
 "
 }
 
@@ -55,12 +59,7 @@ Usage:
 compiledbtool.pl help <command>
 
 Commands:
-help    - get help for a specific command
-addflag - add a compile flag to the database
-rmflag  - remove a compile flag from the database
-lsflag  - lookup flags matching a regex
-abspath - make flags with paths absolute
-join    - join multiple compile databases together
+$COMMANDS
 "
     } elsif($ARGV[1] eq "addflag") {
         print STDERR "
