@@ -10,12 +10,14 @@ if ! which curl; then
     exit 1
 fi
 
-if [ "$(realpath --relative-to "$HOME" .)" != .vim ]; then
-    echo "Execute this script in the .vim directory"
+if [ ! -f vim-full-setup.sh ] && [ ! -f vim-install.sh ]; then
+    echo "run this in the .vim directory"
     exit 1
 fi
 
 ROOT_DIR="$PWD"
+LLVM_VER=clang+llvm-7.0.0-x86_64-linux-gnu-ubuntu-16.04
+LLVM_URL=http://releases.llvm.org/7.0.0/$LLVM_VER.tar.xz
 
 function usage {
 cat <<EOF
@@ -64,22 +66,22 @@ read -p "Install vim [y/n]?" yn
 
 function download_llvm {
     pushd "$ROOT_DIR"
-    if [ ! -f clang+llvm-6.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz ]; then
-        if ! wget https://releases.llvm.org/6.0.1/clang+llvm-6.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz; then
+    if [ ! -f $LLVM_VER.tar.xz ]; then
+        if ! wget $LLVM_URL; then
             echo "failed to download LLVM"
             exit 1
         fi
     fi
     
-    if [ ! -d clang+llvm-6.0.1-x86_64-linux-gnu-ubuntu-16.04 ]; then
+    if [ ! -d $LLVM_VER ]; then
         echo "Untarring LLVM..."
-        if ! tar -xf clang+llvm-6.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz; then
+        if ! tar -xf $LLVM_VER.tar.xz; then
             echo "failed to untar LLVM"
             exit 1
         fi
     fi
 
-    llvm_dir="$ROOT_DIR"/clang+llvm-6.0.1-x86_64-linux-gnu-ubuntu-16.04
+    llvm_dir="$ROOT_DIR"/$LLVM_VER
     popd
 }
 
@@ -140,28 +142,35 @@ if [ ! -f autoload/plug.vim ]; then
     fi
 fi
 
-## Get Vundle so we can install all the other plugins
-#if [ ! -d ./bundle/Vundle.vim ]; then
-#    git clone https://github.com/VundleVim/Vundle.vim.git bundle/Vundle.vim
-#    if [ $? -ne 0 ]; then
-#        echo "Failed to download vundle"
-#        exit 1
-#    fi
-#fi
-
 cd "$ROOT_DIR"
+
+echo "Checking vim can run..."
+if ! vim --help; then
+    echo "vim does not run"
+    exit 1
+fi
+echo "Ok, vim runs"
 
 # Run vundle to configure all plugins, ignore the errors from this
 vim +PlugUpdate +qall
 
 if [ "$CONFIG" = nocompile ]; then
-    echo "Everything done for configuration: nocompile"
+    echo Everything is done for nocompile
     exit 0
 fi
 
 if ! which cmake; then
     echo "Please install cmake"
     exit 1
+fi
+
+if which ccache; then
+    ccache_args=(
+        -DCMAKE_C_COMPILER_LAUNCHER=ccache
+        -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+    )
+else
+    ccache_args=()
 fi
 
 read -p "Install libncurses zlib via apt (Required) [y/n]?" yn
@@ -196,7 +205,7 @@ mkdir build
 cd build
 
 cmake .. -DCMAKE_PREFIX_PATH="$llvm_dir" -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" -DSYSTEM_CLANG=1 \
-    -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release &&
+    -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release "${ccache_args[@]}" &&
     make -j$(nproc) && make install
 
 if [ $? -ne 0 ]; then
@@ -218,7 +227,7 @@ if [ -d ./bundle/color_coded ]; then
     cd build
 
     cmake -DDOWNLOAD_CLANG=0 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" \
-        -DLLVM_ROOT_DIR="$llvm_dir" .. &&
+        -DLLVM_ROOT_DIR="$llvm_dir" "${ccache_args[@]}" .. &&
         make -j$(nproc) && make install
 
     if [ $? -ne 0 ]; then
@@ -236,10 +245,24 @@ if [ "$CONFIG" = asyncomplete ]; then
     exit 0
 fi
 
+# Rust
+rustok=true
+if ! which rustup; then
+    echo "rustup is required for rust, skipping rust config"
+    rustok=false
+fi
+
+if $rustok; then
+    rustup component add rls-preview rust-analysis rust-src
+fi
+
 # YouCompleteMe
 if [ -d ./bundle/YouCompleteMe ]; then
     cd ./bundle/YouCompleteMe
-    git reset --hard
+
+    if $rustok; then
+        ./install.py --rust-completer --skip-build --no-regex
+    fi
 
     rm -rf build
     mkdir build
@@ -247,7 +270,8 @@ if [ -d ./bundle/YouCompleteMe ]; then
 
     cmake -DCMAKE_BUILD_TYPE=Release -DPATH_TO_LLVM_ROOT="$llvm_dir" \
         -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" -DCMAKE_BUILD_RPATH="$llvm_dir/lib" . \
-        "$ROOT_DIR"/bundle/YouCompleteMe/third_party/ycmd/cpp &&
+        -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,$llvm_dir/lib" \
+        "$ROOT_DIR"/bundle/YouCompleteMe/third_party/ycmd/cpp "${ccache_args[@]}" &&
         make -j$(nproc) ycm_core
     if [ $? -ne 0 ]; then
         echo "Failed to build ycmd"
@@ -261,12 +285,16 @@ if [ -d ./bundle/YouCompleteMe ]; then
     cd build_regex
 
     cmake . "$ROOT_DIR"/bundle/YouCompleteMe/third_party/ycmd/third_party/cregex \
-        -DCMAKE_BUILD_TYPE=Release &&
+        -DCMAKE_BUILD_TYPE=Release "${ccache_args[@]}" &&
         make -j$(nproc) _regex
     if [ $? -ne 0 ]; then
         echo "Failed to build cregex for ycm"
         exit 1
     fi
+
+    # Delete ycm's copy of libclang and force it to use the one we compiled cquery with
+    cd "$ROOT_DIR"
+    rm bundle/YouCompleteMe/third_party/ycmd/libclang.so.7
 fi
 
 echo "Everything was completed successfully!"

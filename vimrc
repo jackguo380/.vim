@@ -38,7 +38,6 @@ set wildmode=longest:full
 " Line numbers
 set nu
 " Use 4 spaces rather than tabs
-" These settings only take effect if sleuth fails to detect
 set ts=4
 set tabstop=4
 set shiftwidth=4

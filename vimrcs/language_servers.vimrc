@@ -19,6 +19,9 @@ let g:lsp_diagnostics_echo_cursor = 1
 " Only use lsp diagnostics if YCM is disabled
 au FileType c,cpp let g:lsp_diagnostics_echo_cursor = ! config_use_ycm
 
+" Ycm doesn't seem to put out rust diagnostics, use lsp
+au FileType rust let b:lsp_signs_enabled = 1
+
 let g:lsp_signs_error = {'text': '✘'}
 let g:lsp_signs_warning = {'text': '‼'}
 let g:lsp_signs_hint = {'text': '❓'}
@@ -40,6 +43,17 @@ if executable('pyls')
         \ })
 endif
 
+" Rust language server
+"if executable('rls')
+    "let s:rust_root_dir = FindProjectRoot()
+    "au User lsp_setup call lsp#register_server({
+    "    \ 'name': 'rls',
+    "    \ 'cmd': {server_info->['rls']},
+    "    \ 'root_uri': {server_info->lsp#utils#path_to_uri(s:rust_root_dir)},
+    "    \ 'whitelist': ['rust'],
+    "    \ })
+"endif
+
 if config_use_cquery
     let s:cquery_lang_server_executable = $VIMHOME . "/cquery/build/release/bin/cquery"
     let s:cquery_root_dir = FindProjectRoot()
@@ -48,9 +62,12 @@ if config_use_cquery
                     \ 'name': 'cquery',
                     \ 'cmd': {server_info->[s:cquery_lang_server_executable]},
                     \ 'root_uri': {server_info->lsp#utils#path_to_uri(s:cquery_root_dir)},
-                    \ 'initialization_options': { 'cacheDirectory': s:cquery_root_dir . '/.cquery_cache' },
                     \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+                    \ 'initialization_options':
+                    \ { 'cacheDirectory': s:cquery_root_dir . '/.cquery_cache',
+                    \ 'enableIndexOnDidChange' : v:true,
+                    \ 'diagnostics': { 'frequencyMs' : -1, 'onType' : v:false},
+                    \ 'completion': {'detailedLabel' : v:true} }
                     \ })
     endif
-
 endif

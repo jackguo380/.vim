@@ -48,14 +48,14 @@ if config_use_cquery
     Plug 'pdavydov108/vim-lsp-cquery'
 endif
 
+" Rust colors, indent, etc.
+Plug 'rust-lang/rust.vim'
+
 " eldar color scheme
 Plug 'agude/vim-eldar'
 
 " file explorer
 Plug 'scrooloose/nerdtree'
-
-" automatic tab width
-Plug 'tpope/vim-sleuth'
 
 " Status Bar
 Plug 'vim-airline/vim-airline'
@@ -113,4 +113,10 @@ CurlPlug "syntax/cmake.vim" 'https://raw.githubusercontent.com/Kitware/CMake/mas
 
 " CMake indent
 CurlPlug 'indent/cmake.vim' 'https://raw.githubusercontent.com/Kitware/CMake/master/Auxiliary/vim/indent/cmake.vim'
+
+" Enable termdebug
+packadd termdebug
+
+au FileType rust let b:termdebugger = 'rust-gdb'
+au FileType c,cpp let b:termdebugger = 'gdb'
 
