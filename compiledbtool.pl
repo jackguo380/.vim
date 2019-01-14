@@ -38,6 +38,8 @@ if(not @ARGV) {
     exit 1
 }
 
+exit 0;
+
 sub usage {
     print STDERR "
 Clang compilation database manipulation tool
