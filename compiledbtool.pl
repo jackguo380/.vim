@@ -19,6 +19,8 @@ if(not @ARGV) {
     lsflagcommand();
 } elsif($ARGV[0] eq "abspath") {
     abspathcommand();
+} elsif($ARGV[0] eq "join") {
+    joincommand();
 } else {
     print STDERR colored("Unknown command: $ARGV[0]\n", "red")
     unless($ARGV[0] eq "-h" or $ARGV[0] eq "--help");
@@ -42,6 +44,7 @@ addflag - add a compile flag to the database
 rmflag  - remove a compile flag from the database
 lsflag  - lookup flags matching a regex
 abspath - make flags with paths absolute
+join    - join multiple compile databases together
 "
 }
 
@@ -57,6 +60,7 @@ addflag - add a compile flag to the database
 rmflag  - remove a compile flag from the database
 lsflag  - lookup flags matching a regex
 abspath - make flags with paths absolute
+join    - join multiple compile databases together
 "
     } elsif($ARGV[1] eq "addflag") {
         print STDERR "
@@ -94,7 +98,26 @@ Options:
 
     } elsif($ARGV[1] eq "abspath") { 
         print STDERR "
-Not implemented
+Change relative paths to absolute paths.
+if --working-directory is given don't modify flags but just
+add -working-directory for all files.
+
+Usage:
+compiledbtool.pl abspath [<options>]
+
+Options:
+--working-directory - use Clang's -working-directory flag
+"
+    } elsif($ARGV[1] eq "join") { 
+        print STDERR "
+Join multiple compile_commands.json together
+The last filename is the output.
+
+Usage:
+compiledbtool.pl join [<options>] <cdb1> <cdb2> [<cdb3> ...] <cdbout>
+
+Options:
+None so far...
 "
     }
 }
@@ -143,7 +166,8 @@ sub rmflagcommand {
             }
         }
 
-        for my $idx (@remlist) {
+        # Must do this in reverse so indexs don't get invalidated
+        for my $idx (reverse @remlist) {
             splice @{$command->{"arguments"}}, $idx, 1;
         }
     }
@@ -187,13 +211,75 @@ sub lsflagcommand {
 }
 
 sub abspathcommand {
-    print STDERR "Not yet implemented";
+    my $useworkdir = 0;
+
+    GetOptions(
+        'working-directory' => \$useworkdir
+    ) or die "Failed to parse options";
+
+    my $cdb = readcdb();
+
+    for my $command (@$cdb) {
+        my $curfile = $command->{"file"};
+        my $curdir = $command->{"directory"};
+
+        if(not defined $command->{"arguments"}) {
+            print STDERR "Missing arguments key for $curfile\n";
+            die "Cannot support older command schema";
+        }
+
+        if($useworkdir) {
+            push @{$command->{"arguments"}}, "-working-directory";
+            push @{$command->{"arguments"}}, $curdir;
+            print STDERR colored($curfile, "yellow"), ": Adding -working-directory $curdir\n";
+        } else {
+            die "Not implemented yet";
+            my $next_is_path = 0;
+
+            for my $idx (0 .. @{$command->{"arguments"}} - 1) {
+                my $arg = $command->{"arguments"}[$idx];
+                my $path;
+                if($arg =~ /^-I(.+)/) {
+                } elsif($arg =~ /^-isystem(.+)/) {
+                    print STDERR colored($curfile, "yellow"), ": $arg\n";
+                }
+            }
+        }
+    }
+
+    writecdb($cdb);
+}
+
+sub joincommand {
+    shift @ARGV;
+    
+    if(@ARGV < 2) {
+        die "Specify atleast 2 files";
+    }
+
+    my @joinedcdb;
+
+    for my $cdbfile (@ARGV[0..-2]) {
+        push @joinedcdb, @{readcdb($cdbfile)};
+    }
+
+    if(-f $ARGV[-1]) {
+        push @joinedcdb, @{readcdb($ARGV[-1])};
+    }
+
+    writecdb(\@joinedcdb);
 }
 
 sub readcdb {
+    my $filename = "compile_commands.json";
+
+    if(@_ > 0) {
+        ($filename) = @_;
+    }
+
     my $cdbstr = do {
-        open(my $cdb, "<", "compile_commands.json") or
-        die "compile_commands.json does not exist!";
+        open(my $cdb, "<", $filename) or
+        die "$filename does not exist!";
 
         local $/ = undef;
         <$cdb>;
