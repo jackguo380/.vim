@@ -56,7 +56,16 @@ endif
 
 if config_use_cquery
     let s:cquery_lang_server_executable = $VIMHOME . "/cquery/build/release/bin/cquery"
-    let s:cquery_root_dir = FindProjectRoot()
+    " Search upwards for .cquery_root marker
+    let s:cquery_root_dir = findfile('.cquery_root', expand('%:p:h', 1) . ';')
+
+    " If we find it use that as the root, otherwise use the vim root
+    if s:cquery_root_dir != ''
+      let s:cquery_root_dir = fnamemodify(s:cquery_root_dir, ':p:h')
+    else
+      let s:cquery_root_dir = FindProjectRoot()
+    endif
+
     if executable(s:cquery_lang_server_executable)
         au User lsp_setup call lsp#register_server({
                     \ 'name': 'cquery',
