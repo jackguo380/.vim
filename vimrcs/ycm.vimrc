@@ -10,6 +10,7 @@ if executable('rustc')
     let g:ycm_rust_src_path = substitute(system('rustc --print sysroot'), '\n\+$', '', '') . '/lib/rustlib/src/rust/src'
 endif
 "let g:ycm_python_binary_path = 'python3'
+let g:ycm_server_python_interpreter = 'python3'
 set completeopt-=preview
 
 nmap cyg :YcmCompleter GoToDefinition<CR>
