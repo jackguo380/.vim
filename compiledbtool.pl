@@ -267,14 +267,14 @@ Options:
 
             for my $idx (0 .. @{$command->{"arguments"}} - 1) {
                 if($next_is_path) {
-                    $command->{"arguments"}[$idx] = canonpath(
-                        $curdir . "/" . $command->{"arguments"}[$idx]
-                    );
+                    my $path = $command->{"arguments"}[$idx];
+                    if(!file_name_is_absolute($path)) {
+                        $command->{"arguments"}[$idx] = canonpath($curdir . "/" . $path);
+                    }
                     $next_is_path = 0;
                 } else {
                     my $arg = $command->{"arguments"}[$idx];
                     my $flag;
-                    my $print = 1;
                     if($arg =~ /^-I(.*)/) {
                         $flag = "-I";
                     } elsif($arg =~ /^-isystem(.*)/) {
@@ -292,16 +292,12 @@ Options:
                     if(length($1) > 0) {
                         if(!file_name_is_absolute($1)) {
                             $command->{"arguments"}[$idx] = $flag . canonpath($curdir . "/" . $1);
-                        } else {
-                            $print = 0;
                         }
                     } else {
                         $next_is_path = 1;
                     }
 
-                    if($print) {
-                        print STDERR colored($curfile, "yellow"), ": Making $flag absolute\n";
-                    }
+                    print STDERR colored($curfile, "yellow"), ": Making $flag absolute\n";
                 }
             }
         }
