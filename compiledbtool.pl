@@ -289,7 +289,7 @@ Options:
                         next;
                     }
 
-                    if(defined($1)) {
+                    if(length($1) > 0) {
                         if(!file_name_is_absolute($1)) {
                             $command->{"arguments"}[$idx] = $flag . canonpath($curdir . "/" . $1);
                         } else {
