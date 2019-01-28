@@ -231,6 +231,14 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Build a debug version
+cmake .. -DCMAKE_INSTALL_PREFIX=debug -DCMAKE_BUILD_TYPE=RelWithDebInfo &&
+    make -j$(nproc) && make install
+
+if [ $? -ne 0 ]; then
+    echo "Failed to build debug cquery"
+    exit 1
+fi
 
 cd "$ROOT_DIR"
 

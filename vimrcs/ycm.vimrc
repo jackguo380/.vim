@@ -1,5 +1,5 @@
 "YouCompleteMe
-let g:ycm_extra_conf_globlist = ['~/work/*', '~/Documents/*']
+let g:ycm_extra_conf_globlist = ['~/.vim/*', '~/work/*', '~/Documents/*']
 let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 let g:ycm_enable_diagnostic_signs = 1
 let g:ycm_autoclose_preview_window_after_insertion = 1
@@ -13,6 +13,7 @@ endif
 let g:ycm_server_python_interpreter = 'python3'
 set completeopt-=preview
 
+let g:ycm_log_level = 'debug'
 let g:ycm_guoj_project_root = FindProjectRoot()
 let g:ycm_extra_conf_vim_data = ['g:ycm_guoj_project_root']
 

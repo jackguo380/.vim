@@ -32,6 +32,7 @@ from distutils.sysconfig import get_python_inc
 import platform
 import os
 import re
+import sys
 import ycm_core
 import json
 
@@ -82,6 +83,7 @@ def IsHeaderFile( filename ):
 # corresponding source file.
 # E.g. a/b/include/c/x.hpp -> a/b/src/c/x.cpp
 def FindHeaderCompileFlagsByPath( cdb, filename ):
+  print('FindHeaderCompileFlagsByPath')
   path_comp = []
   path_rem = filename
 
@@ -99,41 +101,50 @@ def FindHeaderCompileFlagsByPath( cdb, filename ):
         paths.append(cpy)
 
   for path in paths:
+    path.append('/') # make it absolute
     path.reverse()
     path_str = os.path.splitext(os.path.join(*tuple(path)))[0]
 
     for ext in SOURCE_EXTENSIONS:
-      compilation_info = cdb.GetCompilationInfoForFile( path_str + ext )
-      if compilation_info:
-        return compilation_info
+      src_file = path_str + ext
+      print('Try Path: ', src_file)
+      compilation_info = cdb.GetCompilationInfoForFile( src_file )
+      if compilation_info.compiler_flags_:
+        print('Found Compile Info: ', src_file)
+        return (compilation_info, src_file)
 
-  return None
+  return (None, None)
 
 # Find a file that has the same name (minus the extension)
 # E.g. abcd.hpp and abcd.cpp
 # if multiple are found we use the one which is closest to the file
 def FindHeaderCompileFlagsByFilename(cdb, filename):
+  print('FindHeaderCompileFlagsByFilename')
   fname = os.path.splitext(os.path.basename(filename))[0]
   same_name_files = []
 
-  for entry in cdb:
+  for entry in database_json:
     if fname == os.path.splitext(os.path.basename(entry['file']))[0]:
       same_name_files.append(os.path.join(entry['directory'], entry['file']))
+
+  print("Same name files: ", same_name_files)
 
   if len(same_name_files) == 0:
     return None
 
   compilation_info = None
+  compilation_file = None
   longest_len = 0
   for f in same_name_files:
     c_info = cdb.GetCompilationInfoForFile(f)
     l = len(os.path.commonpath([f, filename]))
-    if l >= longest_len and c_info:
+    if l >= longest_len and c_info.compiler_flags_:
+      print('Longest = ', f)
       compilation_info = c_info
+      compilation_file = f
       longest_len = l
 
-  return compilation_info
-
+  return (compilation_info, compilation_file)
 
 def Settings( **kwargs ):
   if kwargs['language'] != 'cfamily':
@@ -162,25 +173,31 @@ def Settings( **kwargs ):
     }
 
   compilation_info = database.GetCompilationInfoForFile( filename )
+  compilation_file = None
 
   if not compilation_info.compiler_flags_:
     if IsHeaderFile(filename):
       # Try a similar path to find a source with the same name
-      compilation_info = FindHeaderCompileFlagsByPath(database, filename)
+      (compilation_info, compilation_file) = FindHeaderCompileFlagsByPath(database, filename)
 
-      if not compilation_info:
+      if not compilation_info or not compilation_info.compiler_flags_:
         # Try finding any file with the same name
-        compilation_info = FindHeaderCompileFlagsByFilename(database, filename)
+        (compilation_info, compilation_file) = FindHeaderCompileFlagsByFilename(database, filename)
 
     # If we still cannot find flags, just use generic ones
-    if not compilation_info:
+    if not compilation_info or not compilation_info.compiler_flags_:
       return {
         'flags': flags,
         'include_paths_relative_to_dir': project_root,
         'override_filename': filename
       }
+    #else:
+    #  filename = compilation_file
 
   final_flags = list( compilation_info.compiler_flags_ )
+
+  if compilation_file and os.path.splitext( compilation_file )[ 1 ] != '.c':
+    final_flags.append('-xc++')
 
   return {
     'flags': final_flags,

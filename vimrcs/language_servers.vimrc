@@ -27,11 +27,11 @@ let g:lsp_signs_warning = {'text': '‼'}
 let g:lsp_signs_hint = {'text': '❓'}
 
 if executable('bash-language-server')
-  au User lsp_setup call lsp#register_server({
-        \ 'name': 'bash-language-server',
-        \ 'cmd': {server_info->[&shell, &shellcmdflag, 'bash-language-server start']},
-        \ 'whitelist': ['sh'],
-        \ })
+    au User lsp_setup call lsp#register_server({
+          \ 'name': 'bash-language-server',
+          \ 'cmd': {server_info->[&shell, &shellcmdflag, 'bash-language-server start']},
+          \ 'whitelist': ['sh'],
+          \ })
 endif
 
 if executable('pyls')
@@ -55,7 +55,29 @@ endif
 "endif
 
 if config_use_cquery
-    let s:cquery_lang_server_executable = $VIMHOME . "/cquery/build/release/bin/cquery"
+    let s:cquery_lang_server_executable = [$VIMHOME . "/cquery/build/release/bin/cquery"]
+    let cquery_ok = executable(s:cquery_lang_server_executable[0])
+
+    " If a .cquery_debug file exists, use gdbserver to run the debug
+    " symbol version
+    if filereadable($VIMHOME . '/.cquery_debug')
+        let cquery_debug_port_f = readfile($VIMHOME . '/.cquery_debug')
+        let cquery_debug_exec = $VIMHOME . '/cquery/build/debug/bin/cquery'
+        
+        if len(cquery_debug_port_f) > 0 && len(cquery_debug_port_f[0]) > 0
+            let cquery_debug_port = cquery_debug_port_f[0]
+            if executable('gdbserver') && executable(cquery_debug_exec)
+                echomsg "Running Cquery in Debug mode on port ".cquery_debug_port
+                let s:cquery_lang_server_executable = ['gdbserver', ':'.cquery_debug_port, cquery_debug_exec]
+                let cquery_ok = 1
+            else
+                echohl WarningMsg | echomsg "Cannot run Cquery in debug mode" | echohl None
+            endif
+        else
+            echohl WarningMsg | echomsg "Specify a port in .cquery_debug" | echohl None
+        endif
+    endif
+
     " Search upwards for .cquery_root marker
     let s:cquery_root_dir = findfile('.cquery_root', expand('%:p:h', 1) . ';')
 
@@ -66,10 +88,10 @@ if config_use_cquery
       let s:cquery_root_dir = FindProjectRoot()
     endif
 
-    if executable(s:cquery_lang_server_executable)
+    if cquery_ok
         au User lsp_setup call lsp#register_server({
                     \ 'name': 'cquery',
-                    \ 'cmd': {server_info->[s:cquery_lang_server_executable]},
+                    \ 'cmd': s:cquery_lang_server_executable,
                     \ 'root_uri': {server_info->lsp#utils#path_to_uri(s:cquery_root_dir)},
                     \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
                     \ 'initialization_options':
