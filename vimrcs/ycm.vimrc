@@ -13,6 +13,9 @@ endif
 let g:ycm_server_python_interpreter = 'python3'
 set completeopt-=preview
 
+let g:ycm_guoj_project_root = FindProjectRoot()
+let g:ycm_extra_conf_vim_data = ['g:ycm_guoj_project_root']
+
 nmap cyg :YcmCompleter GoToDefinition<CR>
 nmap cys :YcmCompleter GoToDeclaration<CR>
 nmap cyf :YcmCompleter GoToInclude<CR>

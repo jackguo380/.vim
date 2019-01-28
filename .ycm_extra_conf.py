@@ -33,10 +33,8 @@ import platform
 import os
 import re
 import ycm_core
+import json
 
-# These are the compilation flags that will be used in case there's no
-# compilation database set (by default, one is not set).
-# CHANGE THIS LIST OF FLAGS. YES, THIS IS THE DROID YOU HAVE BEEN LOOKING FOR.
 cflags = [
 '-std=c11',
 ]
@@ -48,7 +46,6 @@ cxxflags = [
 flags = [
 '-Wall',
 '-Wextra',
-'-Werror',
 '-Wno-long-long',
 '-Wno-variadic-macros',
 '-fexceptions',
@@ -57,45 +54,98 @@ flags = [
 ]
 
 
-# Set this to the absolute path to the folder (NOT the file!) containing the
-# compile_commands.json file to use that instead of 'flags'. See here for
-# more details: http://clang.llvm.org/docs/JSONCompilationDatabase.html
-#
-# You can get CMake to generate this file for you by adding:
-#   set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
-# to your CMakeLists.txt file.
-#
-# Most projects will NOT need to set this to anything; you can just change the
-# 'flags' list of compilation flags. Notice that YCM itself uses that approach.
-compilation_database_folder = '.'
+def DirectoryOfThisScript():
+  return os.path.dirname( os.path.abspath( __file__ ) )
+
+# Replace with DirectoryOfThisScript() if copying to working directory
+working_directory = os.getcwd()
+
+compilation_database_folder = working_directory
 
 if os.path.exists( compilation_database_folder ):
   database = ycm_core.CompilationDatabase( compilation_database_folder )
+  try:
+    with open(os.path.join(compilation_database_folder, 'compile_commands.json')) as db:
+      database_json = json.load(db)
+  except:
+    database_json = []
 else:
   database = None
 
 SOURCE_EXTENSIONS = [ '.cpp', '.cxx', '.cc', '.c', '.m', '.mm' ]
 
-def DirectoryOfThisScript():
-  return os.path.dirname( os.path.abspath( __file__ ) )
-
-
 def IsHeaderFile( filename ):
   extension = os.path.splitext( filename )[ 1 ]
   return extension in [ '.h', '.hxx', '.hpp', '.hh' ]
 
+# Replace instances of source folders with includes to try to find a
+# corresponding source file.
+# E.g. a/b/include/c/x.hpp -> a/b/src/c/x.cpp
+def FindHeaderCompileFlagsByPath( cdb, filename ):
+  path_comp = []
+  path_rem = filename
 
-def FindCorrespondingSourceFile( filename ):
-  if IsHeaderFile( filename ):
-    basename = os.path.splitext( filename )[ 0 ]
-    for extension in SOURCE_EXTENSIONS:
-      replacement_file = basename + extension
-      if os.path.exists( replacement_file ):
-        return replacement_file
-  return filename
+  while not path_rem in [ '', '/' ]:
+    path_rem, comp = os.path.split(path_rem)
+    path_comp.append(comp)
+
+  paths = [path_comp]
+
+  for idx, comp in enumerate(path_comp):
+    if comp in [ 'include', 'inc', 'Include' ]:
+      for src_dir in [ 'src', 'source', 'Source' ]:
+        cpy = path_comp.copy()
+        cpy[idx] = src_dir
+        paths.append(cpy)
+
+  for path in paths:
+    path.reverse()
+    path_str = os.path.splitext(os.path.join(*tuple(path)))[0]
+
+    for ext in SOURCE_EXTENSIONS:
+      compilation_info = cdb.GetCompilationInfoForFile( path_str + ext )
+      if compilation_info:
+        return compilation_info
+
+  return None
+
+# Find a file that has the same name (minus the extension)
+# E.g. abcd.hpp and abcd.cpp
+# if multiple are found we use the one which is closest to the file
+def FindHeaderCompileFlagsByFilename(cdb, filename):
+  fname = os.path.splitext(os.path.basename(filename))[0]
+  same_name_files = []
+
+  for entry in cdb:
+    if fname == os.path.splitext(os.path.basename(entry['file']))[0]:
+      same_name_files.append(os.path.join(entry['directory'], entry['file']))
+
+  if len(same_name_files) == 0:
+    return None
+
+  compilation_info = None
+  longest_len = 0
+  for f in same_name_files:
+    c_info = cdb.GetCompilationInfoForFile(f)
+    l = len(os.path.commonpath([f, filename]))
+    if l >= longest_len and c_info:
+      compilation_info = c_info
+      longest_len = l
+
+  return compilation_info
 
 
-def FlagsForFile( filename, **kwargs ):
+def Settings( **kwargs ):
+  if kwargs['language'] != 'cfamily':
+    return {}
+
+  filename = kwargs['filename']
+
+  try:
+    project_root = kwargs['client_data']['g:ycm_guoj_project_root']
+  except KeyError:
+    project_root = working_directory
+
   if not database:
     curflags = flags
 
@@ -107,27 +157,29 @@ def FlagsForFile( filename, **kwargs ):
 
     return {
       'flags': flags,
-      'include_paths_relative_to_dir': DirectoryOfThisScript(),
+      'include_paths_relative_to_dir': project_root,
       'override_filename': filename
     }
 
   compilation_info = database.GetCompilationInfoForFile( filename )
 
   if not compilation_info.compiler_flags_:
-    # If the file was a header it may not have info
-    # Retry with the corresponding source file
-    filename = FindCorrespondingSourceFile( filename )
-    compilation_info = database.GetCompilationInfoForFile( filename )
+    if IsHeaderFile(filename):
+      # Try a similar path to find a source with the same name
+      compilation_info = FindHeaderCompileFlagsByPath(database, filename)
 
-    if not compilation_info.compiler_flags_:
+      if not compilation_info:
+        # Try finding any file with the same name
+        compilation_info = FindHeaderCompileFlagsByFilename(database, filename)
+
+    # If we still cannot find flags, just use generic ones
+    if not compilation_info:
       return {
         'flags': flags,
-        'include_paths_relative_to_dir': DirectoryOfThisScript(),
+        'include_paths_relative_to_dir': project_root,
         'override_filename': filename
       }
 
-  # Bear in mind that compilation_info.compiler_flags_ does NOT return a
-  # python list, but a "list-like" StringVec object.
   final_flags = list( compilation_info.compiler_flags_ )
 
   return {
