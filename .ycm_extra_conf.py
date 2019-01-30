@@ -130,7 +130,7 @@ def FindHeaderCompileFlagsByFilename(cdb, filename):
   print("Same name files: ", same_name_files)
 
   if len(same_name_files) == 0:
-    return None
+    return (None, None)
 
   compilation_info = None
   compilation_file = None
