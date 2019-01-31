@@ -96,6 +96,9 @@ Plug 'bfrg/vim-cpp-modern'
 " Markdown Preview
 Plug 'iamcco/markdown-preview.vim'
 
+" CSV files
+Plug 'chrisbra/csv.vim'
+
 call plug#end()
 
 " Some extra non-github plugins

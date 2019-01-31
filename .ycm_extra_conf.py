@@ -79,18 +79,27 @@ def IsHeaderFile( filename ):
   extension = os.path.splitext( filename )[ 1 ]
   return extension in [ '.h', '.hxx', '.hpp', '.hh' ]
 
-# Replace instances of source folders with includes to try to find a
-# corresponding source file.
-# E.g. a/b/include/c/x.hpp -> a/b/src/c/x.cpp
-def FindHeaderCompileFlagsByPath( cdb, filename ):
-  print('FindHeaderCompileFlagsByPath')
+def SplitPath(path):
   path_comp = []
-  path_rem = filename
+  path_rem = path
 
   while not path_rem in [ '', '/' ]:
     path_rem, comp = os.path.split(path_rem)
     path_comp.append(comp)
 
+  if len(path_rem) > 0:
+    path_comp.append(path_rem)
+
+  path_comp.reverse()
+  return path_comp
+
+# Replace instances of source folders with includes to try to find a
+# corresponding source file.
+# E.g. a/b/include/c/x.hpp -> a/b/src/c/x.cpp
+def FindHeaderCompileFlagsByPath( cdb, filename ):
+  print('FindHeaderCompileFlagsByPath({})'.format(filename))
+  path_comp = SplitPath(filename)
+  path_comp.reverse()
   paths = [path_comp]
 
   for idx, comp in enumerate(path_comp):
@@ -100,8 +109,24 @@ def FindHeaderCompileFlagsByPath( cdb, filename ):
         cpy[idx] = src_dir
         paths.append(cpy)
 
+  path_strs = []
+  path_norm_strs= []
   for path in paths:
-    path.append('/') # make it absolute
+    p = path.copy()
+    p.reverse()
+    path_str = os.path.splitext(os.path.join(*tuple(p)))[0]
+    for ext in SOURCE_EXTENSIONS:
+      path_strs.append(path_str + ext)
+      path_norm_strs.append(os.path.normpath(path_str + ext))
+
+  for entry in database_json:
+    f_norm = os.path.normpath(entry['file'])
+    if f_norm in path_strs or f_norm in path_norm_strs:
+      f_spl = SplitPath(f_norm)
+      f_spl.reverse()
+      paths.append(f_spl)
+
+  for path in paths:
     path.reverse()
     path_str = os.path.splitext(os.path.join(*tuple(path)))[0]
 
@@ -119,7 +144,7 @@ def FindHeaderCompileFlagsByPath( cdb, filename ):
 # E.g. abcd.hpp and abcd.cpp
 # if multiple are found we use the one which is closest to the file
 def FindHeaderCompileFlagsByFilename(cdb, filename):
-  print('FindHeaderCompileFlagsByFilename')
+  print('FindHeaderCompileFlagsByFilename({})'.format(filename))
   fname = os.path.splitext(os.path.basename(filename))[0]
   same_name_files = []
 
@@ -145,6 +170,48 @@ def FindHeaderCompileFlagsByFilename(cdb, filename):
       longest_len = l
 
   return (compilation_info, compilation_file)
+
+# Find a file in the same folder with the same extension
+# (.hpp and .h may have different flags)
+def FindHeaderCompileFlagsByFolder(cdb, filename):
+  print('FindHeaderCompileFlagsByFolder({})'.format(filename))
+  file_ext = os.path.splitext(filename)[1]
+  dnames = []
+  # Also search 1 directory up
+  dnames.append(os.path.dirname(filename))
+  dnames.append(os.path.dirname(dnames[-1]))
+
+  print("Search Directories: ", dnames)
+
+  same_dir_files = []
+
+  for d in dnames:
+    same_ext = []
+    for i in os.listdir(d):
+      full_i = os.path.join(d, i)
+      if os.path.splitext(i)[1] == file_ext and os.path.isfile(full_i):
+        same_ext.append(full_i)
+    same_dir_files.append(same_ext)
+
+  for i, flist in enumerate(same_dir_files):
+    print('Number of files in', dnames[i], ': ', len(flist))
+
+  for flist in same_dir_files:
+    for f in flist:
+      print("Searching Paths for", f)
+      compilation_info, compilation_file = FindHeaderCompileFlagsByPath(cdb, f)
+
+      if compilation_info and compilation_info.compiler_flags_:
+        return (compilation_info, compilation_file)
+
+    for f in flist:
+      print("Searching Filenames for", f)
+      compilation_info, compilation_file = FindHeaderCompileFlagsByFilename(cdb, f)
+
+      if compilation_info and compilation_info.compiler_flags_:
+        return (compilation_info, compilation_file)
+
+  return (None, None)
 
 def Settings( **kwargs ):
   if kwargs['language'] != 'cfamily':
@@ -177,12 +244,16 @@ def Settings( **kwargs ):
 
   if not compilation_info.compiler_flags_:
     if IsHeaderFile(filename):
-      # Try a similar path to find a source with the same name
+      # Try a similar path to find a source with the same name (a/b/include/x.hpp and a/b/src/x.cpp)
       (compilation_info, compilation_file) = FindHeaderCompileFlagsByPath(database, filename)
 
       if not compilation_info or not compilation_info.compiler_flags_:
-        # Try finding any file with the same name
+        # Try finding any file with the same name (E.g. Abc.hpp and Abc.cpp)
         (compilation_info, compilation_file) = FindHeaderCompileFlagsByFilename(database, filename)
+
+        if not compilation_info or not compilation_info.compiler_flags_:
+          # Try finding any file in the same folder with the same extension
+          (compilation_info, compilation_file) = FindHeaderCompileFlagsByFolder(database, filename)
 
     # If we still cannot find flags, just use generic ones
     if not compilation_info or not compilation_info.compiler_flags_:
