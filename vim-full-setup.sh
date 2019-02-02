@@ -278,14 +278,30 @@ fi
 
 if $rustok; then
     rustup component add rls-preview rust-analysis rust-src
+
+    if [ $? -ne 0 ]; then
+        echo "Failed to configure rust, disabling"
+        rustok=false
+    fi
 fi
 
 # YouCompleteMe
 if [ -d ./bundle/YouCompleteMe ]; then
     cd ./bundle/YouCompleteMe
 
+    install_py_flags=(
+    --clangd-completer
+    --skip-build # Don't build ycm_core, do this manually via CMake
+    --no-regex   # Same with regex
+    )
+
     if $rustok; then
-        ./install.py --rust-completer --skip-build --no-regex
+        install_py_flags+=( --rust-completer )
+    fi
+
+    if ! ./install.py "${install_py_flags[@]}"; then
+        echo "Failed to run install.py"
+        exit 1
     fi
 
     rm -rf build
