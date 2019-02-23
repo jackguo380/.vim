@@ -1,11 +1,16 @@
 " Language servers and vim-lsp config
 nmap csfg :LspDefinition<CR>
-nmap csfc :LspReferences<CR>
 nmap csfs :LspReferences<CR>
 nmap csfi :LspImplementation<CR>
 nmap csft :LspTypeDefinition<CR>
 nmap csfh :LspHover<CR>
 nmap csfr :LspRename<CR>
+
+" Cquery specific
+nmap csfc :LspCqueryCallers<CR>
+nmap csfv :LspCqueryVars<CR>
+nmap csfd :LspCqueryDerived<CR>
+nmap csfb :LspCqueryBase<CR>
 
 nmap <leader>d :LspDocumentDiagnostics<CR>
 

@@ -13,7 +13,7 @@ if config_use_ycm
     Plug 'Valloric/YouCompleteMe' 
 
     " YCM config generator
-    Plug 'rdnetto/YCM-Generator'
+    "Plug 'rdnetto/YCM-Generator'
 endif
 
 if config_use_color_coded
@@ -98,6 +98,12 @@ Plug 'iamcco/markdown-preview.vim'
 
 " CSV files
 Plug 'chrisbra/csv.vim'
+
+" MIB files
+Plug 'sedan07/vim-mib'
+
+" HTML tag matching
+Plug 'Valloric/MatchTagAlways'
 
 call plug#end()
 

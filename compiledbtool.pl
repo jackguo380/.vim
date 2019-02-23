@@ -18,6 +18,7 @@ my %COMMANDS_MAP = (
     'lsflag' => \&lsflagcommand,
     'abspath' => \&abspathcommand,
     'join' => \&joincommand,
+    'dumpcmd' => \&dumpcmdcommand,
     #    'globalflags' => \&globalflagscommand
 );
 
@@ -28,6 +29,7 @@ rmflag  - remove a compile flag from the database
 lsflag  - lookup flags matching a regex
 abspath - make flags with paths absolute
 join    - join multiple compile databases together
+dumpcmd - dump the command for files matching a regex
 ";
 # globalflags - create a global set of flags
 
@@ -379,6 +381,52 @@ None so far...
 
     for my $flag (keys %flaghash) {
         print "$flag\t\t$flaghash{$flag}";
+    }
+}
+
+sub dumpcmdcommand {
+    my @args = @_;
+
+    if (is_help(@_)) {
+        print STDERR "
+Dump the full command used for compiling.
+This can be useful to test compile a source file to see the errors.
+
+Usage:
+compiledbtool.pl dumpcmd <source file regex>
+
+Options:
+None
+";
+        exit 0;
+    }
+
+    if (@args < 1) {
+        print STDERR "Please specify a regex\n";
+        exit 1;
+    }
+    my $regex = qr/$args[0]/;
+
+    my $cdb = readcdb();
+
+    my @match_commands;
+
+    for my $command (@$cdb) {
+        my $file = $command->{"file"};
+
+        if ($file =~ $regex) {
+            push @match_commands, $command;
+        }
+    }
+
+    if (@match_commands == 1) {
+        print join(' ', @{$match_commands[0]->{"arguments"}}), "\n";
+    } elsif (@match_commands == 0) {
+        print STDERR colored("No files match the regex\n", "red");
+    } else {
+        for my $command (@match_commands) {
+            print colored($command->{"file"}, "yellow"), ": ", join(' ', @{$command->{"arguments"}}), "\n";
+        }
     }
 }
 

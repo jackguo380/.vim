@@ -16,8 +16,8 @@ if [ ! -f vim-full-setup.sh ] && [ ! -f vim-install.sh ]; then
 fi
 
 ROOT_DIR="$PWD"
-LLVM_VER=clang+llvm-7.0.0-x86_64-linux-gnu-ubuntu-16.04
-LLVM_URL=http://releases.llvm.org/7.0.0/$LLVM_VER.tar.xz
+LLVM_VER=clang+llvm-7.0.1-x86_64-linux-gnu-ubuntu-18.04
+LLVM_URL=http://releases.llvm.org/7.0.1/$LLVM_VER.tar.xz
 LLVM6_VER=clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04
 LLVM6_URL=http://releases.llvm.org/6.0.0/$LLVM6_VER.tar.xz
 
@@ -334,7 +334,7 @@ if [ -d ./bundle/YouCompleteMe ]; then
 
     # Delete ycm's copy of libclang and force it to use the one we compiled cquery with
     cd "$ROOT_DIR"
-    rm bundle/YouCompleteMe/third_party/ycmd/libclang.so.7
+    rm -f bundle/YouCompleteMe/third_party/ycmd/libclang.so.7
 fi
 
 echo "Everything was completed successfully!"
