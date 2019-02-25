@@ -17,3 +17,4 @@ build-standalone/
 Python-3.5.6.tar.xz
 lua-5.2.3_Linux319_64_lib.tar.gz
 vim
+ccls

@@ -31,11 +31,6 @@ au VimEnter * exe 'cd ' . FindProjectRoot()
 " Configuration
 if filereadable($VIMHOME . "/.config.txt")
     let my_config = readfile($VIMHOME . "/.config.txt")[0]
-
-    if ! ( my_config ==# "ycm" || my_config ==# "nocompile" || my_config ==# "asyncomplete" )
-        echoerr "Bad Vimrc Configuration: " . my_config
-        let my_config = "nocompile"
-    endif
 else
     echoerr "No Vimrc Configuration Found!"
     let my_config = "nocompile"
@@ -46,14 +41,19 @@ if my_config ==# "ycm"
     let config_use_color_coded = 1
     let config_use_asyncomplete = 0
     let config_use_cquery = 1
-elseif my_config ==# "nocompile"
-    let config_use_ycm = 0
-    let config_use_color_coded = 0
-    let config_use_asyncomplete = 0
-    let config_use_cquery = 0
 elseif my_config ==# "asyncomplete"
     let config_use_ycm = 0
     let config_use_color_coded = 1
     let config_use_asyncomplete = 1
     let config_use_cquery = 1
+else
+    if my_config !=# "nocompile"
+        echoerr "Bad Vimrc Configuration: " . my_config
+        let my_config = "nocompile"
+    endif
+
+    let config_use_ycm = 0
+    let config_use_color_coded = 0
+    let config_use_asyncomplete = 0
+    let config_use_cquery = 0
 endif

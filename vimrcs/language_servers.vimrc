@@ -59,51 +59,51 @@ endif
     "    \ })
 "endif
 
-if config_use_cquery
-    let s:cquery_lang_server_executable = [$VIMHOME . "/cquery/build/release/bin/cquery"]
-    let cquery_ok = executable(s:cquery_lang_server_executable[0])
+let s:cquery_lang_server_executable = [$VIMHOME . "/cquery/build/release/bin/cquery"]
+let s:ccls_lang_server_executable = [$VIMHOME . "/ccls/build/release/bin/ccls"]
 
-    " If a .cquery_debug file exists, use gdbserver to run the debug
-    " symbol version
-    if filereadable($VIMHOME . '/.cquery_debug')
-        let cquery_debug_port_f = readfile($VIMHOME . '/.cquery_debug')
-        let cquery_debug_exec = $VIMHOME . '/cquery/build/debug/bin/cquery'
-        
-        if len(cquery_debug_port_f) > 0 && len(cquery_debug_port_f[0]) > 0
-            let cquery_debug_port = cquery_debug_port_f[0]
-            if executable('gdbserver') && executable(cquery_debug_exec)
-                echomsg "Running Cquery in Debug mode on port ".cquery_debug_port
-                let s:cquery_lang_server_executable = ['gdbserver', ':'.cquery_debug_port, cquery_debug_exec]
-                let cquery_ok = 1
-            else
-                echohl WarningMsg | echomsg "Cannot run Cquery in debug mode" | echohl None
-            endif
-        else
-            echohl WarningMsg | echomsg "Specify a port in .cquery_debug" | echohl None
-        endif
-    endif
-
+if executable(s:cquery_lang_server_executable[0])
     " Search upwards for .cquery_root marker
     let s:cquery_root_dir = findfile('.cquery_root', expand('%:p:h', 1) . ';')
 
     " If we find it use that as the root, otherwise use the vim root
     if s:cquery_root_dir != ''
-      let s:cquery_root_dir = fnamemodify(s:cquery_root_dir, ':p:h')
+        let s:cquery_root_dir = fnamemodify(s:cquery_root_dir, ':p:h')
     else
-      let s:cquery_root_dir = FindProjectRoot()
+        let s:cquery_root_dir = FindProjectRoot()
     endif
 
-    if cquery_ok
-        au User lsp_setup call lsp#register_server({
-                    \ 'name': 'cquery',
-                    \ 'cmd': s:cquery_lang_server_executable,
-                    \ 'root_uri': {server_info->lsp#utils#path_to_uri(s:cquery_root_dir)},
-                    \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-                    \ 'initialization_options':
-                    \ { 'cacheDirectory': s:cquery_root_dir . '/.cquery_cache',
-                    \ 'enableIndexOnDidChange' : v:true,
-                    \ 'diagnostics': { 'frequencyMs' : -1, 'onType' : v:false},
-                    \ 'completion': {'detailedLabel' : v:true} }
-                    \ })
+    au User lsp_setup call lsp#register_server({
+                \ 'name': 'cquery',
+                \ 'cmd': s:cquery_lang_server_executable,
+                \ 'root_uri': {server_info->lsp#utils#path_to_uri(s:cquery_root_dir)},
+                \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+                \ 'initialization_options': {
+                \ 'cacheDirectory': s:cquery_root_dir . '/.cquery_cache',
+                \ 'diagnostics': { 'frequencyMs' : -1, 'onType' : v:false},
+                \ 'completion': {'detailedLabel' : v:true} 
+                \ }
+                \ })
+
+elseif executable(s:ccls_lang_server_executable[0])
+    " Search upwards for .ccls_root marker
+    let s:ccls_root_dir = findfile('.ccls_root', expand('%:p:h', 1) . ';')
+
+    " If we find it use that as the root, otherwise use the vim root
+    if s:ccls_root_dir != ''
+        let s:ccls_root_dir = fnamemodify(s:cquery_root_dir, ':p:h')
+    else
+        let s:ccls_root_dir = FindProjectRoot()
     endif
+
+    au User lsp_setup call lsp#register_server({
+                \ 'name': 'ccls',
+                \ 'cmd': s:ccls_lang_server_executable,
+                \ 'root_uri': {server_info->lsp#utils#path_to_uri(s:ccls_root_dir)},
+                \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+                \ 'initialization_options': { 
+                \ 'cache': { 'directory': s:ccls_root_dir . '/.cquery_cache' },
+                \ }
+                \ })
 endif
+

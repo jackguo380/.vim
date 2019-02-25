@@ -23,7 +23,7 @@ LLVM6_URL=http://releases.llvm.org/6.0.0/$LLVM6_VER.tar.xz
 
 function usage {
 cat <<EOF
-Usage: $0 -c <config>
+Usage: $0 -c <config> -l <language server>
 -c <config>
 Configs:
 ycm - use YCM instead of asyncomplete
@@ -31,12 +31,18 @@ nocompile - install only vimscript plugins
 windows - only stuff that works in windows, (currently an alias for nocompile)
 asyncomplete - use asyncomplete as a replacement for YCM
 
+-l <language server>
+Servers:
+cquery
+ccls
+
 EOF
 }
 
 CONFIG=none
+LANGSERVER=none
 
-while getopts "c:h" opt; do 
+while getopts "l:c:h" opt; do 
     case $opt in
         c)
             case "$OPTARG" in
@@ -44,7 +50,14 @@ while getopts "c:h" opt; do
                 nocompile) CONFIG="$OPTARG" ;;
                 windows) CONFIG="nocompile" ;;
                 asyncomplete) CONFIG="$OPTARG" ;;
-                *) echo "Invalid config: $OPTARG"; exit 1 ;;
+                *) echo "Invalid config: $OPTARG" ; exit 1 ;;
+            esac
+            ;;
+        l)
+            case "$OPTARG" in
+                cquery) LANGSERVER="$OPTARG" ;;
+                ccls) LANGSERVER="$OPTARG" ;;
+                *) echo "Invalid lang server: $OPTARG" ; exit 1 ;;
             esac
             ;;
         h)
@@ -59,6 +72,12 @@ done
 if [ "$CONFIG" = none ]; then
     usage
     echo "A configuration must be specified"
+    exit 1
+fi
+
+if [ "$LANGSERVER" = none ]; then
+    usage
+    echo "A language server must be specified"
     exit 1
 fi
 
@@ -191,7 +210,7 @@ else
     ccache_args=()
 fi
 
-read -p "Install libncurses zlib via apt (Required) [y/n]?" yn
+read -p "Install libncurses zlib via apt [y/n]?" yn
 if [ "$yn" = y ]; then
     sudo apt install libncurses[0-9]-dev zlib1g-dev zlib1g
 fi
@@ -201,42 +220,89 @@ download_llvm
 
 cd "$ROOT_DIR"
 
-# CQuery
-# CQuery doesn't like the the Apt based Clang/LLVM. But it downloads LLVM 6.01 which
-# we can use to compile Color Coded and YoucompleteMe
-if [ ! -d cquery ]; then
-    if ! git clone https://github.com/cquery-project/cquery.git --recursive cquery; then
-        echo "failed to clone cquery"
+if [ "$LANGSERVER" = cquery ]; then
+    # Ensure ccls is disabled
+    rm -rf ccls/build
+
+    # CQuery
+    # CQuery doesn't like the the Apt based Clang/LLVM. But it downloads LLVM 6.01 which
+    # we can use to compile Color Coded and YoucompleteMe
+    if [ ! -d cquery ]; then
+        if ! git clone https://github.com/cquery-project/cquery.git --recursive cquery; then
+            echo "failed to clone cquery"
+            exit 1
+        fi
+    fi
+
+    cd cquery
+
+    if ! git pull && git submodule update --init; then
+        echo "failed to update cquery"
         exit 1
     fi
-fi
 
-cd cquery
+    rm -rf build
+    mkdir build
+    cd build
 
-if ! git pull && git submodule update --init; then
-    echo "failed to update cquery"
-    exit 1
-fi
+    cmake .. -DCMAKE_PREFIX_PATH="$llvm_dir" -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" -DSYSTEM_CLANG=1 \
+        -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release "${ccache_args[@]}" &&
+        make -j$(nproc) && make install
 
-rm -rf build
-mkdir build
-cd build
+    if [ $? -ne 0 ]; then
+        echo "Failed to build cquery"
+        exit 1
+    fi
 
-cmake .. -DCMAKE_PREFIX_PATH="$llvm_dir" -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" -DSYSTEM_CLANG=1 \
-    -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release "${ccache_args[@]}" &&
-    make -j$(nproc) && make install
+    # Build a debug version
+    cmake .. -DCMAKE_INSTALL_PREFIX=debug -DCMAKE_BUILD_TYPE=RelWithDebInfo &&
+        make -j$(nproc) && make install
 
-if [ $? -ne 0 ]; then
-    echo "Failed to build cquery"
-    exit 1
-fi
+    if [ $? -ne 0 ]; then
+        echo "Failed to build debug cquery"
+        exit 1
+    fi
+elif [ "$LANGSERVER" = ccls ]; then
+    # Ensure cquery is disabled
+    rm -rf cquery/build
 
-# Build a debug version
-cmake .. -DCMAKE_INSTALL_PREFIX=debug -DCMAKE_BUILD_TYPE=RelWithDebInfo &&
-    make -j$(nproc) && make install
+    if [ ! -d ccls ]; then
+        if ! git clone https://github.com/MaskRay/ccls.git --recursive ccls; then
+            echo "failed to clone ccls"
+            exit 1
+        fi
+    fi
 
-if [ $? -ne 0 ]; then
-    echo "Failed to build debug cquery"
+    cd ccls
+
+    if ! git pull && git submodule update --init; then
+        echo "failed to update ccls"
+        exit 1
+    fi
+
+    rm -rf build
+    mkdir build
+    cd build
+
+    cmake .. -DCMAKE_PREFIX_PATH="$llvm_dir" -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" \
+        -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release "${ccache_args[@]}" &&
+        make -j$(nproc) && make install
+
+    if [ $? -ne 0 ]; then
+        echo "Failed to build ccls"
+        exit 1
+    fi
+
+    # Build a debug version
+    cmake .. -DCMAKE_INSTALL_PREFIX=debug -DCMAKE_BUILD_TYPE=RelWithDebInfo &&
+        make -j$(nproc) && make install
+
+    if [ $? -ne 0 ]; then
+        echo "Failed to build debug ccls"
+        exit 1
+    fi
+else
+    echo "Invalid language server: $LANGSERVER"
     exit 1
 fi
 
