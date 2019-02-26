@@ -22,10 +22,7 @@ let g:lsp_log_file = expand('/tmp/vim-lsp.log')
 "let g:lsp_signs_enabled = 0 Disabled until its a bit less annoying
 let g:lsp_diagnostics_echo_cursor = 1
 " Only use lsp diagnostics if YCM is disabled
-au FileType c,cpp let g:lsp_diagnostics_echo_cursor = ! config_use_ycm
-
-" Ycm doesn't seem to put out rust diagnostics, use lsp
-au FileType rust let b:lsp_signs_enabled = 1
+autocmd FileType c,cpp let g:lsp_diagnostics_echo_cursor = ! config_use_ycm
 
 let g:lsp_signs_error = {'text': '✘'}
 let g:lsp_signs_warning = {'text': '‼'}
@@ -81,7 +78,8 @@ if executable(s:cquery_lang_server_executable[0])
                 \ 'initialization_options': {
                 \ 'cacheDirectory': s:cquery_root_dir . '/.cquery_cache',
                 \ 'diagnostics': { 'frequencyMs' : -1, 'onType' : v:false},
-                \ 'completion': {'detailedLabel' : v:true} 
+                \ 'completion': {'detailedLabel' : v:true},
+                \ 'highlight': {'enabled' : v:true},
                 \ }
                 \ })
 

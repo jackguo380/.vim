@@ -51,6 +51,9 @@ if config_use_cquery
     Plug 'pdavydov108/vim-lsp-cquery'
 endif
 
+" Language server highlighting
+Plug 'jackguo380/vim-lsp-cpp-highlight'
+
 " Rust colors, indent, etc.
 Plug 'rust-lang/rust.vim'
 

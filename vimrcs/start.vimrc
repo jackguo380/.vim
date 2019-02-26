@@ -17,7 +17,7 @@ function! FindProjectRoot()
             " The trailing / in directories needs a extra :h to remove
             let wdlist += [ fnamemodify(wd, isdir ? ':p:h:h' : ':p:h')]
         endif
-    endfo
+    endfor
 
     " Find the longest path length
     call sort(wdlist, function("s:comparelens"))
@@ -26,7 +26,10 @@ function! FindProjectRoot()
     return fnameescape(len(wdlist) == 0 ? getcwd() : wdlist[0])
 endfunction
 
-au VimEnter * exe 'cd ' . FindProjectRoot()
+augroup startprojectroot
+    autocmd!
+    autocmd VimEnter * exe 'cd ' . FindProjectRoot()
+augroup END
 
 " Configuration
 if filereadable($VIMHOME . "/.config.txt")
