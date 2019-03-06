@@ -18,7 +18,7 @@ endif
 
 if config_use_color_coded
     " Better C++ highlighting, also needs to be compiled
-    Plug 'jeaye/color_coded'
+    "Plug 'jeaye/color_coded'
 endif
 
 " Async helpers, used for asyncomplete, vim-lsp, ..
@@ -52,7 +52,7 @@ if config_use_cquery
 endif
 
 " Language server highlighting
-Plug 'jackguo380/vim-lsp-cpp-highlight'
+Plug 'jackguo380/vim-lsp-cxx-highlight'
 
 " Rust colors, indent, etc.
 Plug 'rust-lang/rust.vim'
@@ -94,7 +94,7 @@ Plug 'vhda/verilog_systemverilog.vim'
 Plug 'kien/ctrlp.vim'
 
 " Better C++ highlighting
-Plug 'bfrg/vim-cpp-modern'
+"Plug 'bfrg/vim-cpp-modern'
 
 " Markdown Preview
 Plug 'iamcco/markdown-preview.vim'

@@ -18,6 +18,8 @@ nmap <leader>d :LspDocumentDiagnostics<CR>
 let g:lsp_log_verbose = 1
 let g:lsp_log_file = expand('/tmp/vim-lsp.log')
 
+let g:lsp_cxx_hl_log_file = '/tmp/lsp-cxx-hl.log'
+
 " Enable diagnostic signs
 "let g:lsp_signs_enabled = 0 Disabled until its a bit less annoying
 let g:lsp_diagnostics_echo_cursor = 1
@@ -89,7 +91,7 @@ elseif executable(s:ccls_lang_server_executable[0])
 
     " If we find it use that as the root, otherwise use the vim root
     if s:ccls_root_dir != ''
-        let s:ccls_root_dir = fnamemodify(s:cquery_root_dir, ':p:h')
+        let s:ccls_root_dir = fnamemodify(s:ccls_root_dir, ':p:h')
     else
         let s:ccls_root_dir = FindProjectRoot()
     endif
@@ -99,8 +101,8 @@ elseif executable(s:ccls_lang_server_executable[0])
                 \ 'cmd': s:ccls_lang_server_executable,
                 \ 'root_uri': {server_info->lsp#utils#path_to_uri(s:ccls_root_dir)},
                 \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-                \ 'initialization_options': { 
-                \ 'cache': { 'directory': s:ccls_root_dir . '/.cquery_cache' },
+                \ 'initialization_options': {
+                \ 'cache': { 'directory': s:ccls_root_dir . '/.ccls_cache' },
                 \ }
                 \ })
 endif
