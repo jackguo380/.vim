@@ -12,6 +12,9 @@ hi! link StorageClass Statement
 " Fix vim-cpp-modern highlighting namespaces same as enums
 hi! link cppSTLnamespace Namespace
 
+" Disable highlighting of functions in vim-cpp-modern
+let g:cpp_no_function_highlight = 1
+
 "Transparent Terminal
 hi! Normal ctermbg=none
 

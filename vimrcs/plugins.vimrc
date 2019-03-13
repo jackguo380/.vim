@@ -93,8 +93,8 @@ Plug 'vhda/verilog_systemverilog.vim'
 " Fancy file search plugin
 Plug 'kien/ctrlp.vim'
 
-" Better C++ highlighting
-"Plug 'bfrg/vim-cpp-modern'
+" C++ Keywords
+Plug 'bfrg/vim-cpp-modern'
 
 " Markdown Preview
 Plug 'iamcco/markdown-preview.vim'
