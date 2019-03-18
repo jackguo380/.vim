@@ -4,9 +4,11 @@ colorscheme eldar
 " C++ highlighting
 " These are extra color settings not included in eldar
 hi! Function guifg=#8AE234 ctermfg=green gui=italic cterm=italic
-hi! Variable guifg=#FFFFFF ctermfg=white gui=none cterm=none
-hi! Namespace guifg=#FCE94F ctermfg=yellow gui=none cterm=none
-hi! EnumConstant guifg=#AD7FA8 ctermfg=Magenta gui=none cterm=none
+"hi! LspCxxHlSymVariable guifg=#FFFFFF ctermfg=white gui=none cterm=none
+hi link LspCxxHlSymVariable Normal
+hi link LspCxxHlSymParameter Normal
+hi! LspCxxHlSymNamespace guifg=#FCE94F ctermfg=yellow gui=none cterm=none
+hi! LspCxxHlSynEnumMember guifg=#AD7FA8 ctermfg=Magenta gui=none cterm=none
 " Fix for keywords like virtual and other function modifiers
 hi! link StorageClass Statement
 " Fix vim-cpp-modern highlighting namespaces same as enums
