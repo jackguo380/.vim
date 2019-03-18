@@ -48,7 +48,8 @@ endif
 
 if config_use_cquery
     " Language server extension for CQuery
-    Plug 'pdavydov108/vim-lsp-cquery'
+    " Plug 'pdavydov108/vim-lsp-cquery'
+    Plug 'jackguo380/vim-lsp-cquery', { 'branch': 'ccls' }
 endif
 
 " Language server highlighting
