@@ -8,29 +8,31 @@ REPO=https://github.com/vim/vim.git
 # vim's master branch isn't too stable so its good use a known working version
 VER=v8.0.1453
 
+INSTALL_PREFIX=$HOME/.local
+VIM_RUNTIME_DIR=$INSTALL_PREFIX/share/vim/vim80
+
 # -- Compilation --
-if ${USE_CLANG:-false}; then
-    LLVM_DIR="${LLVM_DIR:-$HOME/.vim/clang+llvm-6.0.1-x86_64-linux-gnu-ubuntu-16.04}"
+if [ "${USE_CLANG:-false}" = 1 ] || [ "${USE_CLANG:-false}" = true ]; then
+    LLVM_DIR="${LLVM_DIR:-$HOME/.vim/clang+llvm-7.0.1-x86_64-linux-gnu-ubuntu-18.04}"
     if [ ! -d "$LLVM_DIR" ]; then
         echo "Cant use CLANG since its not downloaded"
         exit 1
     fi
-    # Overkill optimizations...
+
     export CC="$LLVM_DIR/bin/clang"
-    export CFLAGS="-O3 -flto=thin"
-    export LDFLAGS="-fuse-ld=lld -O3 -flto=thin -Wl,--lto-O3,--threads,--thinlto-jobs=$(nproc)"
-#else
-    #export CFLAGS="-O3" 
+    export CFLAGS="-Ofast -flto=thin -march=native"
+    export LDFLAGS="-fuse-ld=lld -Ofast -flto=thin -march=native -Wl,--lto-O3,--threads,--thinlto-jobs=$(nproc)"
+else
+    export CFLAGS="-Ofast -march=native" 
 fi
 
-VIM_RUNTIME_DIR=/usr/local/share/vim/vim$(echo "$VER" | sed 's/v\([0-9]\)\.\([0-9]\).*/\1\2/')
 CONFIG_OPTS=(
-    --enable-pythoninterp=yes 
+    --enable-pythoninterp=no
     --enable-python3interp=yes 
     --enable-perlinterp=yes  
-    --enable-luainterp=yes 
-    --enable-rubyinterp=yes
-#    --with-lua-prefix=/usr/local
+    #--enable-luainterp=yes 
+    #--enable-rubyinterp=yes
+    #--with-lua-prefix=/usr/local
     --enable-cscope 
     --enable-autoservername 
     --enable-terminal
@@ -43,15 +45,16 @@ CONFIG_OPTS=(
     --enable-largefile 
     --with-compiledby="$MYNAME"
     --enable-fail-if-missing 
-    --prefix=/usr/local
+    --prefix="$INSTALL_PREFIX"
 )
 
-UBUNTU1604_APT_PKGS=(
-lua5.1
-liblua5.1-0-dev
+UBUNTU_APT_PKGS=(
+#lua5.1
+#liblua5.1-0-dev
 libperl-dev
-libpython-dev
+#libpython-dev
 libpython3-dev
+libx11-dev libxpm-dev libxt-dev
 )
 
 do_git_clone() {
@@ -75,7 +78,7 @@ do_git_checkout() {
 }
 
 do_apt_packages() {
-    sudo apt install "${UBUNTU1604_APT_PKGS[@]}"
+    sudo apt install "${UBUNTU_APT_PKGS[@]}"
 
     if [ $? -ne 0 ]; then
         echo "Failed to do apt install"
@@ -107,7 +110,7 @@ do_compile() {
 
 do_install() {
     echo "Installing..."
-    sudo make install
+    make install
 
     if [ $? -ne 0 ]; then
         echo "Failed to install Vim"
@@ -117,12 +120,12 @@ do_install() {
 
 do_alternatives() {
     echo "Setting alternatives..."
-    sudo update-alternatives --install /usr/bin/editor editor /usr/local/bin/vim 1
-    sudo update-alternatives --set editor /usr/local/bin/vim
-    sudo update-alternatives --install /usr/bin/vi vi /usr/local/bin/vim 1
-    sudo update-alternatives --set vi /usr/local/bin/vim
-    sudo update-alternatives --install /usr/bin/vim vim /usr/local/bin/vim 1
-    sudo update-alternatives --set vim /usr/local/bin/vim
+    sudo update-alternatives --install /usr/bin/editor editor "$INSTALL_PREFIX/bin/vim" 1
+    sudo update-alternatives --set editor "$INSTALL_PREFIX/bin/vim"
+    sudo update-alternatives --install /usr/bin/vi vi "$INSTALL_PREFIX/bin/vim" 1
+    sudo update-alternatives --set vi "$INSTALL_PREFIX/bin/vim"
+    sudo update-alternatives --install /usr/bin/vim vim "$INSTALL_PREFIX/bin/vim" 1
+    sudo update-alternatives --set vim "$INSTALL_PREFIX/bin/vim"
 }
 
 yn_prompt() {
@@ -158,7 +161,7 @@ fi
 
 do_git_checkout
 
-echo -e "The following apt packages are recommended for Ubuntu 16.04: ${UBUNTU1604_APT_PKGS[*]}\n"
+echo -e "The following apt packages are recommended for Ubuntu: ${UBUNTU_APT_PKGS[*]}\n"
 
 if yn_prompt "install them [y/n]?"; then
     do_apt_packages
