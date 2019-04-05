@@ -6,10 +6,10 @@ MYNAME="Jack Guo"
 REPO=https://github.com/vim/vim.git
 # Version to checkout
 # vim's master branch isn't too stable so its good use a known working version
-VER=v8.0.1453
+VER=v8.1.1099
 
 INSTALL_PREFIX=$HOME/.local
-VIM_RUNTIME_DIR=$INSTALL_PREFIX/share/vim/vim80
+VIM_RUNTIME_DIR=$INSTALL_PREFIX/share/vim/vim81
 
 # -- Compilation --
 if [ "${USE_CLANG:-false}" = 1 ] || [ "${USE_CLANG:-false}" = true ]; then
@@ -36,7 +36,7 @@ CONFIG_OPTS=(
     --enable-cscope 
     --enable-autoservername 
     --enable-terminal
-    --enable-gui=gtk3
+    #--enable-gui=gtk3
     --enable-gtk3-check
     --with-features=huge 
     --with-x 
@@ -100,7 +100,7 @@ do_configure() {
 do_compile() {
     make clean
 
-    make -j$(nproc) VIMRUNTIMEDIR="$VIM_RUNTIME_DIR"
+    make -j$(nproc) #VIMRUNTIMEDIR="$VIM_RUNTIME_DIR"
 
     if [ $? -ne 0 ]; then
         echo "Failed to make Vim"

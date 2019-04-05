@@ -337,8 +337,8 @@ fi
 
 # Rust
 rustok=true
-if ! which rustup; then
-    echo "rustup is required for rust, skipping rust config"
+if command -v rustup && command -v cargo; then
+    echo "rustup and cargo is required for rust, skipping rust config"
     rustok=false
 fi
 
@@ -348,6 +348,15 @@ if $rustok; then
     if [ $? -ne 0 ]; then
         echo "Failed to configure rust, disabling"
         rustok=false
+    fi
+
+    # Install fd
+    git clone https://github.com/sharkdp/fd.git fd
+
+    cd fd 
+    if ! cargo build --release && cargo install --path .; then
+        echo "failed to install fd"
+        exit 1
     fi
 fi
 

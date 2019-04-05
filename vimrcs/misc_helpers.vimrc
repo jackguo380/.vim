@@ -1,5 +1,9 @@
 " Some random useful things
 
+if executable('ag')
+    let &grepprg = 'ag --nogroup --hidden --nocolor'
+endif
+
 " Filter the Quickfix list by the file of the entry
 " if no explicit file is given it takes the current focused buffer's name
 " or if its a nameless buffer (like quickfix) it takes the file under the cursor

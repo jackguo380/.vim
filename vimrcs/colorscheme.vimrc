@@ -5,8 +5,9 @@ colorscheme eldar
 " These are extra color settings not included in eldar
 hi! Function guifg=#8AE234 ctermfg=green gui=italic cterm=italic
 "hi! LspCxxHlSymVariable guifg=#FFFFFF ctermfg=white gui=none cterm=none
-hi link LspCxxHlSymVariable Normal
-hi link LspCxxHlSymParameter Normal
+hi link LspCxxHlSymVariable NONE
+hi link LspCxxHlSymParameter NONE
+hi link LspCxxHlSymUnknown NONE
 hi! LspCxxHlSymNamespace guifg=#FCE94F ctermfg=yellow gui=none cterm=none
 hi! LspCxxHlSynEnumMember guifg=#AD7FA8 ctermfg=Magenta gui=none cterm=none
 " Fix for keywords like virtual and other function modifiers
