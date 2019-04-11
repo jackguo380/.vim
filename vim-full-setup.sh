@@ -342,6 +342,7 @@ if command -v rustup && command -v cargo; then
     rustok=false
 fi
 
+cd "$ROOT_DIR"
 if $rustok; then
     rustup component add rls-preview rust-analysis rust-src
 
@@ -351,7 +352,9 @@ if $rustok; then
     fi
 
     # Install fd
-    git clone https://github.com/sharkdp/fd.git fd
+    if [ ! -d fd ]; then
+        git clone https://github.com/sharkdp/fd.git fd
+    fi
 
     cd fd 
     if ! cargo build --release && cargo install --path .; then
@@ -361,6 +364,7 @@ if $rustok; then
 fi
 
 # YouCompleteMe
+cd "$ROOT_DIR"
 if [ -d ./bundle/YouCompleteMe ]; then
     cd ./bundle/YouCompleteMe
 
