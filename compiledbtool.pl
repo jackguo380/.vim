@@ -5,6 +5,7 @@ use warnings;
 use Getopt::Long qw(GetOptionsFromArray);
 use Term::ANSIColor;
 use File::Spec::Functions qw(canonpath file_name_is_absolute);
+use File::Basename;
 
 eval 'use JSON';
 if ($@) {
@@ -19,17 +20,19 @@ my %COMMANDS_MAP = (
     'abspath' => \&abspathcommand,
     'join' => \&joincommand,
     'dumpcmd' => \&dumpcmdcommand,
+    'gcccrosscompile' => \&gcccrosscompilecommand,
     #    'globalflags' => \&globalflagscommand
 );
 
 my $COMMANDS = "
-help    - get help for a specific command
-addflag - add a compile flag to the database
-rmflag  - remove a compile flag from the database
-lsflag  - lookup flags matching a regex
-abspath - make flags with paths absolute
-join    - join multiple compile databases together
-dumpcmd - dump the command for files matching a regex
+help     - get help for a specific command
+addflag  - add a compile flag to the database
+rmflag   - remove a compile flag from the database
+lsflag   - lookup flags matching a regex
+abspath  - make flags with paths absolute
+join     - join multiple compile databases together
+dumpcmd  - dump the command for files matching a regex
+gcccrosscompile - add flags for cross compilation
 ";
 # globalflags - create a global set of flags
 
@@ -428,6 +431,94 @@ None
             print colored($command->{"file"}, "yellow"), ": ", join(' ', @{$command->{"arguments"}}), "\n";
         }
     }
+}
+
+sub gcccrosscompilecommand {
+    my @args = @_;
+
+    if (is_help(@_)) {
+        print STDERR "
+Add common libclang flags for cross compiling
+this tries to run the cross compiler and checks the filesystem to determine
+extra flags and includes needed for cross compiling.
+
+It is important that the generated database contains the path to the cross compiler as the first argument.
+
+Usage:
+compiledbtool.pl gcccrosscompile
+
+Options:
+None
+";
+        exit 0;
+    }
+
+    my $cdb = readcdb();
+
+    my %compiler_cache;
+
+    for my $command (@$cdb) {
+        if(not defined $command->{"arguments"}) {
+            print STDERR "Missing arguments key\n";
+            die "Cannot support older command schema";
+        }
+
+        my $arguments = $command->{"arguments"};
+        my $compiler = $arguments->[0];
+
+        if ($compiler =~ qr/^[^-].*g?[c+][c+]/) {
+            print STDERR colored($command->{"file"}, "yellow"), ": Compiler = $compiler\n";
+
+            if (not defined $compiler_cache{$compiler}) {
+                my @flags = cross_compile_flags($compiler);
+                $compiler_cache{$compiler} = \@flags;
+            }
+
+            print STDERR colored($command->{"file"}, "yellow"), ": Flags = ", join(",", @{$compiler_cache{$compiler}}), "\n";
+
+            push @{$command->{"arguments"}}, @{$compiler_cache{$compiler}};
+        }
+    }
+
+    writecdb($cdb);
+}
+
+sub cross_compile_flags {
+    my $compiler = $_[0];
+    my @flags;
+
+    `$compiler --version`;
+    
+    if ($? == 0) {
+        my $arch = `$compiler -dumpmachine`;
+
+        push @flags, "--target=$arch" unless ($arch eq "");
+
+        my $libgcc = `$compiler -print-libgcc-file-name`;
+        my $toolchain = dirname(dirname(dirname(dirname(dirname($libgcc)))));
+
+        push @flags, "--gcc-toolchain=$toolchain";
+
+        my $is_system_inc = 0;
+
+        for my $inc_line (split /^/m, `$compiler -E -xc++ -Wp,-v /dev/null 2>&1`) {
+            if ($inc_line =~ /End of search list\./) {
+                $is_system_inc = 0;
+            } elsif ($is_system_inc) {
+                # Remove leading/trailing whitespace
+                $inc_line =~ s/^[ \t]+//;
+                $inc_line =~ s/[ \t]+$//;
+
+                push @flags, "-isystem$inc_line";
+            } elsif ($inc_line =~ /#include <...> search starts here:/) {
+                $is_system_inc = 1;
+            }
+        }
+    }
+
+    chomp @flags;
+
+    return @flags;
 }
 
 sub readcdb {
