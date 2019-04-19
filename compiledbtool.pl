@@ -6,6 +6,7 @@ use Getopt::Long qw(GetOptionsFromArray);
 use Term::ANSIColor;
 use File::Spec::Functions qw(canonpath file_name_is_absolute);
 use File::Basename;
+use List::MoreUtils qw(first_index);
 
 eval 'use JSON';
 if ($@) {
@@ -470,7 +471,7 @@ None
             print STDERR colored($command->{"file"}, "yellow"), ": Compiler = $compiler\n";
 
             if (not defined $compiler_cache{$compiler}) {
-                my @flags = cross_compile_flags($compiler);
+                my @flags = cross_compile_flags($compiler, $command);
                 $compiler_cache{$compiler} = \@flags;
             }
 
@@ -485,6 +486,7 @@ None
 
 sub cross_compile_flags {
     my $compiler = $_[0];
+    my $command = $_[1];
     my @flags;
 
     `$compiler --version`;
@@ -499,19 +501,25 @@ sub cross_compile_flags {
 
         push @flags, "--gcc-toolchain=$toolchain";
 
-        my $is_system_inc = 0;
+        my ($stdinc, $stdinc_cpp) = command_stdinc($command);
 
-        for my $inc_line (split /^/m, `$compiler -E -xc++ -Wp,-v /dev/null 2>&1`) {
-            if ($inc_line =~ /End of search list\./) {
-                $is_system_inc = 0;
-            } elsif ($is_system_inc) {
-                # Remove leading/trailing whitespace
-                $inc_line =~ s/^[ \t]+//;
-                $inc_line =~ s/[ \t]+$//;
+        if ($stdinc) {
+            # Don't use -x c since we may have a g++ compiler in some cases
+            my $xcpp_flag = $stdinc_cpp ? "-xc++" : "";
+            my $is_system_inc = 0;
 
-                push @flags, "-isystem$inc_line";
-            } elsif ($inc_line =~ /#include <...> search starts here:/) {
-                $is_system_inc = 1;
+            for my $inc_line (split /^/m, `$compiler -E $xcpp_flag -Wp,-v /dev/null 2>&1`) {
+                if ($inc_line =~ /End of search list\./) {
+                    $is_system_inc = 0;
+                } elsif ($is_system_inc) {
+                    # Remove leading/trailing whitespace
+                    $inc_line =~ s/^[ \t]+//;
+                    $inc_line =~ s/[ \t]+$//;
+
+                    push @flags, "-isystem$inc_line";
+                } elsif ($inc_line =~ /#include <...> search starts here:/) {
+                    $is_system_inc = 1;
+                }
             }
         }
     }
@@ -519,6 +527,47 @@ sub cross_compile_flags {
     chomp @flags;
 
     return @flags;
+}
+
+sub command_is_cpp {
+    my $command = $_[0];
+
+    my $is_cpp = ($command->{"file"} =~ /\.(cpp|cc|cxx|c\+\+)$/);
+    my $found_x = 0;
+
+    for my $arg (@{$command->{"arguments"}}) {
+        $arg =~ s/^\s+//;
+        $arg =~ s/\s+$//;
+
+        if ($arg eq "-x") {
+            $found_x = 1;
+        } elsif ($found_x) {
+            $is_cpp = ($arg =~ /[Cc]\+\+/);
+            $found_x = 0;
+        }
+    }
+
+    return $is_cpp;
+}
+
+sub command_stdinc {
+    my $command = $_[0];
+    my $stdinc = 1;
+    my $stdinc_cpp = command_is_cpp($command);
+
+    for my $arg (@{$command->{"arguments"}}) {
+        $arg =~ s/^\s+//;
+        $arg =~ s/\s+$//;
+
+        if ($arg eq "-nostdinc") {
+            $stdinc = 0;
+        } elsif ($arg eq "-nostdinc++") {
+            $stdinc_cpp = 0;
+        }
+    }
+
+    return ($stdinc, $stdinc_cpp);
+
 }
 
 sub readcdb {
