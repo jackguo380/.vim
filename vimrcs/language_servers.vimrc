@@ -103,6 +103,7 @@ elseif executable(s:ccls_lang_server_executable[0])
                 \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
                 \ 'initialization_options': {
                 \ 'cache': { 'directory': s:ccls_root_dir . '/.ccls_cache' },
+                \ 'highlight': { 'lsRanges' : v:true },
                 \ }
                 \ })
 endif

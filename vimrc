@@ -18,7 +18,7 @@ source $VIMHOME/vimrcs/airline.vimrc
 source $VIMHOME/vimrcs/cscope-extra.vimrc
 source $VIMHOME/vimrcs/ycm.vimrc
 source $VIMHOME/vimrcs/regexhelpers.vimrc
-source $VIMHOME/vimrcs/ctrlp.vimrc
+"source $VIMHOME/vimrcs/ctrlp.vimrc
 source $VIMHOME/vimrcs/language_servers.vimrc
 source $VIMHOME/vimrcs/asyncomplete.vimrc
 source $VIMHOME/vimrcs/misc_helpers.vimrc

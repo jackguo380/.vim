@@ -92,7 +92,13 @@ Plug 'nachumk/systemverilog.vim'
 Plug 'vhda/verilog_systemverilog.vim'
 
 " Fancy file search plugin
-Plug 'kien/ctrlp.vim'
+"Plug 'kien/ctrlp.vim'
+
+" fzf command line fuzzy finder
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+
+" fzf integration with vim
+Plug 'junegunn/fzf.vim'
 
 " C++ Keywords
 Plug 'bfrg/vim-cpp-modern'
