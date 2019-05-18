@@ -16,10 +16,8 @@ if [ ! -f vim-full-setup.sh ] && [ ! -f vim-install.sh ]; then
 fi
 
 ROOT_DIR="$PWD"
-LLVM_VER=clang+llvm-7.0.1-x86_64-linux-gnu-ubuntu-18.04
-LLVM_URL=http://releases.llvm.org/7.0.1/$LLVM_VER.tar.xz
-LLVM6_VER=clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04
-LLVM6_URL=http://releases.llvm.org/6.0.0/$LLVM6_VER.tar.xz
+LLVM_VER=clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04
+LLVM_URL=http://releases.llvm.org/8.0.0/$LLVM_VER.tar.xz
 
 function usage {
 cat <<EOF
@@ -94,13 +92,6 @@ function download_llvm {
         fi
     fi
 
-    if [ ! -f $LLVM6_VER.tar.xz ]; then
-        if ! wget $LLVM6_URL; then
-            echo "failed to download LLVM6"
-            exit 1
-        fi
-    fi
-    
     if [ ! -d $LLVM_VER ]; then
         echo "Untarring LLVM..."
         if ! tar -xf $LLVM_VER.tar.xz; then
@@ -109,16 +100,7 @@ function download_llvm {
         fi
     fi
 
-    if [ ! -d $LLVM6_VER ]; then
-        echo "Untarring LLVM..."
-        if ! tar -xf $LLVM6_VER.tar.xz; then
-            echo "failed to untar LLVM6"
-            exit 1
-        fi
-    fi
-
     llvm_dir="$ROOT_DIR"/$LLVM_VER
-    llvm6_dir="$ROOT_DIR"/$LLVM6_VER
     popd
 }
 
@@ -253,15 +235,6 @@ if [ "$LANGSERVER" = cquery ]; then
         echo "Failed to build cquery"
         exit 1
     fi
-
-    # Build a debug version
-    cmake .. -DCMAKE_INSTALL_PREFIX=debug -DCMAKE_BUILD_TYPE=RelWithDebInfo &&
-        make -j$(nproc) && make install
-
-    if [ $? -ne 0 ]; then
-        echo "Failed to build debug cquery"
-        exit 1
-    fi
 elif [ "$LANGSERVER" = ccls ]; then
     # Ensure cquery is disabled
     rm -rf cquery/build
@@ -292,39 +265,9 @@ elif [ "$LANGSERVER" = ccls ]; then
         echo "Failed to build ccls"
         exit 1
     fi
-
-    # Build a debug version
-    cmake .. -DCMAKE_INSTALL_PREFIX=debug -DCMAKE_BUILD_TYPE=RelWithDebInfo &&
-        make -j$(nproc) && make install
-
-    if [ $? -ne 0 ]; then
-        echo "Failed to build debug ccls"
-        exit 1
-    fi
 else
     echo "Invalid language server: $LANGSERVER"
     exit 1
-fi
-
-cd "$ROOT_DIR"
-
-# Color Coded
-if [ -d ./bundle/color_coded ]; then
-    cd ./bundle/color_coded
-    rm -rf build
-    mkdir build
-    cd build
-
-    # Use llvm 6 for color coded
-    cmake -DDOWNLOAD_CLANG=0 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_RPATH="$llvm6_dir/lib" \
-        -DLLVM_ROOT_DIR="$llvm6_dir" "${ccache_args[@]}" .. &&
-        make -j$(nproc) && make install
-
-    if [ $? -ne 0 ]; then
-        echo "Failed to build color coded"
-        exit 1
-    fi
-    rm ./* -r
 fi
 
 cd "$ROOT_DIR"

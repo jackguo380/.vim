@@ -10,7 +10,7 @@ Plug 'tpope/vim-sensible'
 
 if config_use_ycm
     " Smart text/code completion, needs to be compiled
-    Plug 'Valloric/YouCompleteMe' 
+    "Plug 'Valloric/YouCompleteMe' 
 
     " YCM config generator
     "Plug 'rdnetto/YCM-Generator'
@@ -23,10 +23,20 @@ endif
 
 " Async helpers, used for asyncomplete, vim-lsp, ..
 " Does nothing on its own
-Plug 'prabirshrestha/async.vim'
+"Plug 'prabirshrestha/async.vim'
 
 " Language server support
-Plug 'prabirshrestha/vim-lsp'
+"Plug 'prabirshrestha/vim-lsp'
+
+Plug 'autozimu/LanguageClient-neovim', { 'branch': 'next', 'do': 'bash install.sh' }
+
+if has('nvim')
+    Plug 'Shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
+else
+    Plug 'Shougo/deoplete.nvim'
+    Plug 'roxma/nvim-yarp'
+    Plug 'roxma/vim-hug-neovim-rpc'
+endif
 
 if config_use_asyncomplete
     " Vimscript only completion system

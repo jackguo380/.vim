@@ -19,10 +19,12 @@ source $VIMHOME/vimrcs/cscope-extra.vimrc
 source $VIMHOME/vimrcs/ycm.vimrc
 source $VIMHOME/vimrcs/regexhelpers.vimrc
 "source $VIMHOME/vimrcs/ctrlp.vimrc
+source $VIMHOME/vimrcs/fzf.vimrc
 source $VIMHOME/vimrcs/language_servers.vimrc
 source $VIMHOME/vimrcs/asyncomplete.vimrc
 source $VIMHOME/vimrcs/misc_helpers.vimrc
 source $VIMHOME/vimrcs/nerdtree.vimrc
+source $VIMHOME/vimrcs/deoplete.vimrc
 
 " TODO: remove commented out settings after testing sensible.vim
 "set autoindent
