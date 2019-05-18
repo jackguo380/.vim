@@ -270,6 +270,14 @@ else
     exit 1
 fi
 
+# Deoplete
+
+read -p "Install deoplete dependencies [y/n]?" yn
+if [ "$yn" = y ]; then
+    sudo apt install python3-pip python3-wheel
+    pip3 install pynvim
+fi
+
 cd "$ROOT_DIR"
 
 # Skip YCM for asyncomplete
