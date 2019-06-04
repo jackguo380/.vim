@@ -1,7 +1,11 @@
 " Startup configuration
 
-function! FindProjectRoot()
-    let cph = expand('%:p:h', 1)
+function! FindProjectRoot(...)
+    if a:0 >= 1
+        let cph = a:1
+    else
+        let cph = expand('%:p:h', 1)
+    endif
     let wdlist = []
 
     " Comparing path's string length is good enough since we search upwards only
