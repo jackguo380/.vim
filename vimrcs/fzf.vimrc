@@ -31,7 +31,7 @@ endfunction
 
 augroup guoj_fzf_replace_cmd
     autocmd!
-    autocmd VimEnter * command! -nargs=* FZF call s:fzf_custom_run(<f-args>)
+    autocmd VimEnter * command! -complete=file -nargs=* FZF call s:fzf_custom_run(<f-args>)
 augroup END
 
 nnoremap <C-p> :FZF<CR>

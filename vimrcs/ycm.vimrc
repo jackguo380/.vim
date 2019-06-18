@@ -17,6 +17,11 @@ let g:ycm_log_level = 'debug'
 let g:ycm_guoj_project_root = FindProjectRoot()
 let g:ycm_extra_conf_vim_data = ['g:ycm_guoj_project_root']
 
+if executable($VIMHOME . '/clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04/bin/clangd')
+    let g:ycm_clangd_binary_path = $VIMHOME . '/clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04/bin/clangd'
+endif
+
+
 nmap cyg :YcmCompleter GoToDefinition<CR>
 nmap cys :YcmCompleter GoToDeclaration<CR>
 nmap cyf :YcmCompleter GoToInclude<CR>

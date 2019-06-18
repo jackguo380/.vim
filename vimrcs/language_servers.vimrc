@@ -51,6 +51,7 @@ let g:LanguageClient_waitOutputTimeout = 30
 let g:lsp_diagnostics_echo_cursor = 1
 " Only use lsp diagnostics if YCM is disabled
 autocmd FileType c,cpp let g:lsp_diagnostics_echo_cursor = ! config_use_ycm
+autocmd FileType c,cpp let g:LanguageClient_diagnosticsEnable = 0
 
 let g:lsp_signs_error = {'text': '✘'}
 let g:lsp_signs_warning = {'text': '‼'}

@@ -1,4 +1,4 @@
-call plug#begin('~/.vim/bundle')
+call plug#begin($VIMHOME . '/bundle')
 
 Plug 'junegunn/vim-plug'
 
@@ -10,7 +10,7 @@ Plug 'tpope/vim-sensible'
 
 if config_use_ycm
     " Smart text/code completion, needs to be compiled
-    "Plug 'Valloric/YouCompleteMe' 
+    Plug 'Valloric/YouCompleteMe' 
 
     " YCM config generator
     "Plug 'rdnetto/YCM-Generator'
@@ -30,13 +30,13 @@ endif
 
 Plug 'autozimu/LanguageClient-neovim', { 'branch': 'next', 'do': 'bash install.sh' }
 
-if has('nvim')
-    Plug 'Shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
-else
-    Plug 'Shougo/deoplete.nvim'
-    Plug 'roxma/nvim-yarp'
-    Plug 'roxma/vim-hug-neovim-rpc'
-endif
+"if has('nvim')
+"    Plug 'Shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
+"else
+"    Plug 'Shougo/deoplete.nvim'
+"    Plug 'roxma/nvim-yarp'
+"    Plug 'roxma/vim-hug-neovim-rpc'
+"endif
 
 if config_use_asyncomplete
     " Vimscript only completion system
