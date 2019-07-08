@@ -1,7 +1,19 @@
 " Some random useful things
 
 if executable('ag')
-    let &grepprg = 'ag --nogroup --hidden --nocolor'
+    let s:aggrep = 'ag --nogroup --hidden --nocolor'
+    let s:aggrep .= ' --ignore .git'
+    let s:aggrep .= ' --ignore .hg'
+    let s:aggrep .= ' --ignore .cquery_cache'
+    let s:aggrep .= ' --ignore .ccls_cache'
+    let s:aggrep .= ' --ignore "*.pyc"'
+    let s:aggrep .= ' --ignore "*.o"'
+    let s:aggrep .= ' --ignore "*.d"'
+    let s:aggrep .= ' --ignore "*.gcda"'
+    let s:aggrep .= ' --ignore "*.gcno"'
+    let s:aggrep .= ' --ignore "*.out"'
+
+    let &grepprg = s:aggrep
 endif
 
 " Filter the Quickfix list by the file of the entry

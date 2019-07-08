@@ -35,6 +35,7 @@ augroup guoj_fzf_replace_cmd
 augroup END
 
 nnoremap <C-p> :FZF<CR>
+nnoremap <leader>fb :Buffers<CR>
 
 nnoremap <leader>ff :FZF <c-r>=expand('%:p:h')<CR><CR>
 
