@@ -62,6 +62,9 @@ nnoremap <leader>l :ls<CR>:b<space>
 " History registers
 nnoremap <leader>rh :reg 0 1 2 3 4 5 6 7 8 9<CR>
 
+" Paste in visual mode without yanking with P
+xnoremap <expr> P '"_d"'.v:register.'P'
+
 "File Browser Config
 let g:netrw_banner = 0 "remove banner
 "let g:netrw_browse_split = 2
