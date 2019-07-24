@@ -6,7 +6,8 @@ let NERDTreeIgnore=['\~$', '\.d$', '\.o$', '\.out$', '\.gcda$', '\.gcno$']
 
 nmap <leader>no :NERDTreeToggle<CR>
 nmap <leader>nf :NERDTreeFocus<CR>
-nmap <leader>nb :NERDTree <C-R>=expand("%")<CR><CR>
+nmap <leader>ng :NERDTree %<CR>
+nmap <leader>nb :NERDTreeFind %<CR>
 nmap <leader>nc :NERDTreeCWD<CR>
 
 " Open automatically if vim starts up with no files

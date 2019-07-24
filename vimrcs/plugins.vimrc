@@ -122,6 +122,9 @@ Plug 'chrisbra/csv.vim'
 " MIB files
 Plug 'sedan07/vim-mib'
 
+" Dockerfile
+Plug 'ekalinin/Dockerfile.vim'
+
 " HTML tag matching
 Plug 'Valloric/MatchTagAlways'
 
