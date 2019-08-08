@@ -47,6 +47,10 @@ set softtabstop=4
 set expandtab
 set smarttab
 
+" Enable histogram diff
+if has('nvim-0.3.2') || has("patch-8.1.0360")
+    set diffopt=filler,internal,algorithm:histogram,indent-heuristic
+endif
 
 let c_space_errors=1
 
