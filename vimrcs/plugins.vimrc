@@ -11,62 +11,35 @@ Plug 'tpope/vim-sensible'
 if config_use_ycm
     " Smart text/code completion, needs to be compiled
     Plug 'Valloric/YouCompleteMe' 
-
-    " YCM config generator
-    "Plug 'rdnetto/YCM-Generator'
 endif
-
-if config_use_color_coded
-    " Better C++ highlighting, also needs to be compiled
-    "Plug 'jeaye/color_coded'
-endif
-
-" Async helpers, used for asyncomplete, vim-lsp, ..
-" Does nothing on its own
-"Plug 'prabirshrestha/async.vim'
 
 " Language server support
-"Plug 'prabirshrestha/vim-lsp'
+Plug 'autozimu/LanguageClient-neovim', {
+	    \ 'branch': 'next',
+	    \ 'do': 'bash install.sh'
+	    \ }
 
-Plug 'autozimu/LanguageClient-neovim', { 'branch': 'next', 'do': 'bash install.sh' }
-
-"if has('nvim')
-"    Plug 'Shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
-"else
-"    Plug 'Shougo/deoplete.nvim'
-"    Plug 'roxma/nvim-yarp'
-"    Plug 'roxma/vim-hug-neovim-rpc'
-"endif
-
-if config_use_asyncomplete
-    " Vimscript only completion system
-    Plug 'prabirshrestha/asyncomplete.vim'
-
-    " Add language servers to asyncomplete
-    Plug 'prabirshrestha/asyncomplete-lsp.vim'
-
-    " File completions
-    Plug 'prabirshrestha/asyncomplete-file.vim'
-
-    " Words in Buffer
-    Plug 'prabirshrestha/asyncomplete-buffer.vim'
-
-    " Vimscript
-    Plug 'Shougo/neco-vim'
-    Plug 'prabirshrestha/asyncomplete-necovim.vim'
-endif
-
-if config_use_cquery
-    " Language server extension for CQuery
-    " Plug 'pdavydov108/vim-lsp-cquery'
-    Plug 'jackguo380/vim-lsp-cquery', { 'branch': 'ccls' }
-endif
+" Language server extension for Cquery
+Plug 'jackguo380/vim-lsp-cquery', {
+	    \ 'branch': 'ccls',
+	    \ 'for': ['c', 'cpp']
+	    \ }
 
 " Language server highlighting
-Plug 'jackguo380/vim-lsp-cxx-highlight'
+"Plug 'jackguo380/vim-lsp-cxx-highlight', {
+Plug '~/Documents/Github/vim-lsp-cxx-highlight', {
+	    \ 'for': ['c', 'cpp']
+	    \ }
+
+" C++ Keywords
+Plug 'bfrg/vim-cpp-modern', {
+	    \ 'for': ['c', 'cpp']
+	    \ }
 
 " Rust colors, indent, etc.
-Plug 'rust-lang/rust.vim'
+Plug 'rust-lang/rust.vim', {
+	    \ 'for': ['rust']
+	    \ }
 
 " eldar color scheme
 Plug 'agude/vim-eldar'
@@ -77,9 +50,6 @@ Plug 'scrooloose/nerdtree'
 " Status Bar
 Plug 'vim-airline/vim-airline'
 
-" Status Bar Themes
-Plug 'vim-airline/vim-airline-themes'
-
 " x86 Highlighting
 "Plug 'shirk/vim-gas'
 
@@ -89,9 +59,6 @@ Plug 'tpope/vim-fugitive'
 " Mercurial Integration
 Plug 'jlfwong/vim-mercenary'
 
-" Python folding
-"Plug 'tmhedberg/SimpylFold'
-
 " Python indentation
 Plug 'vim-scripts/indentpython.vim'
 
@@ -99,37 +66,38 @@ Plug 'vim-scripts/indentpython.vim'
 Plug 'nachumk/systemverilog.vim'
 
 " Verilog compilation
-Plug 'vhda/verilog_systemverilog.vim'
-
-" Fancy file search plugin
-"Plug 'kien/ctrlp.vim'
-
-" fzf command line fuzzy finder
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'vhda/verilog_systemverilog.vim', {
+	    \ 'for': ['systemverilog']
+	    \ }
 
 " fzf integration with vim
+Plug '~/.fzf'
 Plug 'junegunn/fzf.vim'
 
-" C++ Keywords
-Plug 'bfrg/vim-cpp-modern'
-
 " Markdown Preview
-Plug 'iamcco/markdown-preview.vim'
+Plug 'iamcco/markdown-preview.vim', {
+	    \ 'for': ['markdown']
+	    \ }
 
 " CSV files
-Plug 'chrisbra/csv.vim'
-
-" MIB files
-Plug 'sedan07/vim-mib'
+Plug 'chrisbra/csv.vim', {
+	    \ 'for': ['csv']
+	    \ }
 
 " Dockerfile
-Plug 'ekalinin/Dockerfile.vim'
+Plug 'ekalinin/Dockerfile.vim', {
+	    \ 'for': ['Dockerfile']
+	    \ }
 
 " HTML tag matching
-Plug 'Valloric/MatchTagAlways'
+Plug 'Valloric/MatchTagAlways', {
+	    \ 'for': ['html', 'xml']
+	    \ }
 
 " LaTeX
-Plug 'lervag/vimtex'
+Plug 'lervag/vimtex', {
+	    \ 'for': ['tex']
+	    \ }
 
 call plug#end()
 

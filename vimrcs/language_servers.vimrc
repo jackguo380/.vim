@@ -71,17 +71,24 @@ if executable('pyls')
 endif
 
 " Rust language server
-if executable('rls')
-    let s:rust_root_dir = FindProjectRoot()
-    au User lsp_setup call lsp#register_server({
-        \ 'name': 'rls',
-        \ 'cmd': {server_info->['rls']},
-        \ 'root_uri': {server_info->lsp#utils#path_to_uri(s:rust_root_dir)},
-        \ 'whitelist': ['rust'],
-        \ })
+let s:rust_command = []
+if executable('rustup')
+    silent call system('rustup run nightly rls --version')
 
-    let g:LanguageClient_serverCommands['rust'] = ['rls']
-    let g:LanguageClient_rootMarkers['rust'] = ['.rls-root', 'Cargo.toml']
+    if v:shell_error == 0
+        let s:rust_command = ['rustup', 'run', 'nightly', 'rls']
+    else
+        silent call system('rustup run stable rls --version')
+
+        if v:shell_error == 0
+            let s:rust_command = ['rustup', 'run', 'stable', 'rls']
+        endif
+    endif
+endif
+
+if len(s:rust_command) > 0
+    let g:LanguageClient_serverCommands['rust'] = s:rust_command
+    let g:LanguageClient_rootMarkers['rust'] = ['.rls-root']
 endif
 
 let s:cquery_lang_server_executable = [$VIMHOME . "/cquery/build/release/bin/cquery"]
@@ -105,14 +112,6 @@ if executable(s:cquery_lang_server_executable[0])
                 \ 'highlight': {'enabled' : v:true},
                 \ }
 
-    au User lsp_setup call lsp#register_server({
-                \ 'name': 'cquery',
-                \ 'cmd': s:cquery_lang_server_executable,
-                \ 'root_uri': {server_info->lsp#utils#path_to_uri(s:cquery_root_dir)},
-                \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-                \ 'initialization_options': s:cquery_settings
-                \ })
-
     let s:cquery_exec = s:cquery_lang_server_executable + [ '-init=' . json_encode(s:cquery_settings)]
     let g:LanguageClient_serverCommands['c'] = s:cquery_exec
     let g:LanguageClient_serverCommands['cpp'] = s:cquery_exec
@@ -134,14 +133,6 @@ elseif executable(s:ccls_lang_server_executable[0])
                 \ 'cache': { 'directory': s:ccls_root_dir . '/.ccls_cache' },
                 \ 'highlight': { 'lsRanges' : v:true },
                 \ }
-
-    au User lsp_setup call lsp#register_server({
-                \ 'name': 'ccls',
-                \ 'cmd': s:ccls_lang_server_executable,
-                \ 'root_uri': {server_info->lsp#utils#path_to_uri(s:ccls_root_dir)},
-                \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-                \ 'initialization_options': s:ccls_settings
-                \ })
 
     let s:ccls_exec = s:ccls_lang_server_executable + ['-init=' . json_encode(s:ccls_settings)]
     let g:LanguageClient_serverCommands['c'] = s:ccls_exec

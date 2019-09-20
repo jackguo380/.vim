@@ -7,24 +7,21 @@ else
     let $VIMHOME = $HOME."/.vim"
 endif
 
-source $VIMHOME/vimrcs/start.vimrc
-source $VIMHOME/vimrcs/plugins.vimrc
+runtime vimrcs/start.vimrc
+runtime vimrcs/plugins.vimrc
 
 filetype plugin indent on
 syntax on
 let mapleader = ","
 
-source $VIMHOME/vimrcs/airline.vimrc
-source $VIMHOME/vimrcs/cscope-extra.vimrc
-source $VIMHOME/vimrcs/ycm.vimrc
-source $VIMHOME/vimrcs/regexhelpers.vimrc
-"source $VIMHOME/vimrcs/ctrlp.vimrc
-source $VIMHOME/vimrcs/fzf.vimrc
-source $VIMHOME/vimrcs/language_servers.vimrc
-source $VIMHOME/vimrcs/asyncomplete.vimrc
-source $VIMHOME/vimrcs/misc_helpers.vimrc
-source $VIMHOME/vimrcs/nerdtree.vimrc
-source $VIMHOME/vimrcs/deoplete.vimrc
+runtime vimrcs/airline.vimrc
+runtime vimrcs/cscope-extra.vimrc
+runtime vimrcs/ycm.vimrc
+runtime vimrcs/regexhelpers.vimrc
+runtime vimrcs/fzf.vimrc
+runtime vimrcs/language_servers.vimrc
+runtime vimrcs/misc_helpers.vimrc
+runtime vimrcs/nerdtree.vimrc
 
 " TODO: remove commented out settings after testing sensible.vim
 "set autoindent
@@ -74,7 +71,5 @@ let g:netrw_banner = 0 "remove banner
 "let g:netrw_browse_split = 2
 let g:netrw_liststyle = 3 " Use the nice tree style listing
 
-source $VIMHOME/vimrcs/colorscheme.vimrc
+runtime vimrcs/colorscheme.vimrc
 
-" Allow .vimrc files in other folders as a local configuration
-set exrc secure

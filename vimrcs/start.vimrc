@@ -45,13 +45,6 @@ endif
 
 if my_config ==# "ycm"
     let config_use_ycm = 1
-    let config_use_color_coded = 1
-    let config_use_asyncomplete = 0
-    let config_use_cquery = 1
-elseif my_config ==# "asyncomplete"
-    let config_use_ycm = 0
-    let config_use_color_coded = 1
-    let config_use_asyncomplete = 1
     let config_use_cquery = 1
 else
     if my_config !=# "nocompile"
@@ -60,7 +53,5 @@ else
     endif
 
     let config_use_ycm = 0
-    let config_use_color_coded = 0
-    let config_use_asyncomplete = 0
     let config_use_cquery = 0
 endif
