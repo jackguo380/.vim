@@ -193,6 +193,7 @@ fi
 
 cd "$ROOT_DIR"
 if $rustok; then
+    rustup install nightly
     rustup component add --toolchain stable rls rust-analysis rust-src
     rustup component add --toolchain nightly rls rust-analysis rust-src
 
