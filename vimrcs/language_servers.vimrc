@@ -42,6 +42,8 @@ let g:lsp_log_file = '/tmp/vim-lsp.log'
 
 let g:lsp_cxx_hl_log_file = '/tmp/lsp-cxx-hl.log'
 
+let g:lsp_cxx_hl_use_text_props = 1
+
 let g:LanguageClient_loggingFile = '/tmp/languageclient.log'
 " For large files this is a more appropriate timeout
 let g:LanguageClient_waitOutputTimeout = 30

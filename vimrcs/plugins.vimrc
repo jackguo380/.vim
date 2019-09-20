@@ -128,6 +128,9 @@ Plug 'ekalinin/Dockerfile.vim'
 " HTML tag matching
 Plug 'Valloric/MatchTagAlways'
 
+" LaTeX
+Plug 'lervag/vimtex'
+
 call plug#end()
 
 " Some extra non-github plugins
