@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if ! which git; then
     echo "Please install git"
     exit 1
@@ -16,29 +18,20 @@ if [ ! -f vim-full-setup.sh ] && [ ! -f vim-install.sh ]; then
 fi
 
 ROOT_DIR="$PWD"
-LLVM_VER=clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04
-LLVM_URL=http://releases.llvm.org/8.0.0/$LLVM_VER.tar.xz
 
 function usage {
 cat <<EOF
 Usage: $0 -c <config> -l <language server>
 -c <config>
 Configs:
-ycm - use YCM instead of asyncomplete
+ycm - use YCM
 nocompile - install only vimscript plugins
 windows - only stuff that works in windows, (currently an alias for nocompile)
-asyncomplete - use asyncomplete as a replacement for YCM
-
--l <language server>
-Servers:
-cquery
-ccls
 
 EOF
 }
 
 CONFIG=none
-LANGSERVER=none
 
 while getopts "l:c:h" opt; do 
     case $opt in
@@ -47,15 +40,7 @@ while getopts "l:c:h" opt; do
                 ycm) CONFIG="$OPTARG" ;;
                 nocompile) CONFIG="$OPTARG" ;;
                 windows) CONFIG="nocompile" ;;
-                asyncomplete) CONFIG="$OPTARG" ;;
                 *) echo "Invalid config: $OPTARG" ; exit 1 ;;
-            esac
-            ;;
-        l)
-            case "$OPTARG" in
-                cquery) LANGSERVER="$OPTARG" ;;
-                ccls) LANGSERVER="$OPTARG" ;;
-                *) echo "Invalid lang server: $OPTARG" ; exit 1 ;;
             esac
             ;;
         h)
@@ -73,15 +58,11 @@ if [ "$CONFIG" = none ]; then
     exit 1
 fi
 
-if [ "$LANGSERVER" = none ]; then
-    usage
-    echo "A language server must be specified"
-    exit 1
-fi
-
 echo "$CONFIG" > .config.txt
 
-read -p "Install vim [y/n]?" yn
+# Downloaded LLVM
+LLVM_VER=clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04
+LLVM_URL=http://releases.llvm.org/8.0.0/$LLVM_VER.tar.xz
 
 function download_llvm {
     pushd "$ROOT_DIR"
@@ -104,55 +85,17 @@ function download_llvm {
     popd
 }
 
-function compile_install {
-    echo "Compiling vim from Github repository"
-    sleep 2
-
-    read -p "Use LLVM to compile vim [y/n]?" yn
-    if [ "$yn" = y ]; then
-        download_llvm
-        export USE_CLANG=true LLVM_DIR="$llvm_dir"
-    fi
-
-    cd "$HOME" 
-    if ! .vim/vim-install.sh; then
-        echo "Failed to install vim"
-        exit 1
-    fi
-    cd .vim
-}
-
-function apt_install {
-    echo "Ubuntu 18.04 packages has a better vim than I can compile myself, installing via apt"
-    sleep 2
-    if ! sudo apt-get install vim vim-gnome; then
-        echo "Failed to install vim via apt"
-        exit 1
-    fi
-}
-
-PACKAGE_MANAGER=apt-get
-
-# Do installation based on which platform we are on
 source /etc/lsb-release
 
 if [ "$DISTRIB_ID" = LinuxMint ]; then
-    if [ ${DISTRIB_RELEASE:0:2} = 19 ]; then
-        [ "$yn" = y ] && apt_install
-    else
-        [ "$yn" = y ] && compile_install
-    fi
+    PACKAGE_MANAGER=apt-get
 elif [ "$DISTRIB_ID" = Ubuntu ]; then
-    if [ ${DISTRIB_RELEASE:0:2} = 18 ]; then
-        [ "$yn" = y ] && apt_install
-    else
-        [ "$yn" = y ] && compile_install
-    fi
+    PACKAGE_MANAGER=apt-get
 elif [ "$DISTRIB_ID" = ManjaroLinux ]; then
     PACKAGE_MANAGER=pamac
-    [ "$yn" = y ] && compile_install
 else
-    [ "$yn" = y ] && compile_install
+    echo "Unsupported distro $DISTRIB_ID"
+    exit 1
 fi
 
 if [ ! -f autoload/plug.vim ]; then
@@ -165,13 +108,6 @@ if [ ! -f autoload/plug.vim ]; then
 fi
 
 cd "$ROOT_DIR"
-
-echo "Checking vim can run..."
-if ! vim --help; then
-    echo "vim does not run"
-    exit 1
-fi
-echo "Ok, vim runs"
 
 # Run vundle to configure all plugins, ignore the errors from this
 vim +PlugUpdate +qall
@@ -213,107 +149,56 @@ fi
 
 cd "$ROOT_DIR"
 
-if [ "$LANGSERVER" = cquery ]; then
-    # Ensure ccls is disabled
-    rm -rf ccls/build
-
-    # CQuery
-    # CQuery doesn't like the the Apt based Clang/LLVM. But it downloads LLVM 6.01 which
-    # we can use to compile Color Coded and YoucompleteMe
-    if [ ! -d cquery ]; then
-        if ! git clone https://github.com/cquery-project/cquery.git --recursive cquery; then
-            echo "failed to clone cquery"
-            exit 1
-        fi
-    fi
-
-    cd cquery
-
-    if ! git pull && git submodule update --init; then
-        echo "failed to update cquery"
+if [ ! -d ccls ]; then
+    if ! git clone https://github.com/MaskRay/ccls.git --recursive ccls; then
+        echo "failed to clone ccls"
         exit 1
     fi
+fi
 
-    rm -rf build
-    mkdir build
-    cd build
+cd ccls
 
-    cmake .. -DCMAKE_PREFIX_PATH="$llvm_dir" -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" -DSYSTEM_CLANG=1 \
-        -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release "${ccache_args[@]}" &&
-        make -j$(nproc) && make install
+if ! git pull && git submodule update --init; then
+    echo "failed to update ccls"
+    exit 1
+fi
 
-    if [ $? -ne 0 ]; then
-        echo "Failed to build cquery"
-        exit 1
-    fi
-elif [ "$LANGSERVER" = ccls ]; then
-    # Ensure cquery is disabled
-    rm -rf cquery/build
+rm -rf build
+mkdir build
+cd build
 
-    if [ ! -d ccls ]; then
-        if ! git clone https://github.com/MaskRay/ccls.git --recursive ccls; then
-            echo "failed to clone ccls"
-            exit 1
-        fi
-    fi
+cmake .. -DCMAKE_PREFIX_PATH="$llvm_dir" -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" \
+    -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release "${ccache_args[@]}" &&
+    make -j$(nproc) && make install
 
-    cd ccls
-
-    if ! git pull && git submodule update --init; then
-        echo "failed to update ccls"
-        exit 1
-    fi
-
-    rm -rf build
-    mkdir build
-    cd build
-
-    cmake .. -DCMAKE_PREFIX_PATH="$llvm_dir" -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" \
-        -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release "${ccache_args[@]}" &&
-        make -j$(nproc) && make install
-
-    if [ $? -ne 0 ]; then
-        echo "Failed to build ccls"
-        exit 1
-    fi
-else
-    echo "Invalid language server: $LANGSERVER"
+if [ $? -ne 0 ]; then
+    echo "Failed to build ccls"
     exit 1
 fi
 
 cd "$ROOT_DIR"
 
-# Skip YCM for asyncomplete
-if [ "$CONFIG" = asyncomplete ]; then
-    echo "Everything done for config: asyncomplete"
-    exit 0
+# Rust
+
+# Detect per user cargo installations
+if [ -d "$HOME/.cargo/bin" ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
-# Rust
-rustok=true
+rustok=false
 if command -v rustup && command -v cargo; then
     echo "rustup and cargo is required for rust, skipping rust config"
-    rustok=false
+    rustok=true
 fi
 
 cd "$ROOT_DIR"
 if $rustok; then
-    rustup component add rls-preview rust-analysis rust-src
-
-    if [ $? -ne 0 ]; then
-        echo "Failed to configure rust, disabling"
-        rustok=false
-    fi
+    rustup component add --toolchain stable rls rust-analysis rust-src
+    rustup component add --toolchain nightly rls rust-analysis rust-src
 
     # Install fd
-    if [ ! -d fd ]; then
-        git clone https://github.com/sharkdp/fd.git fd
-    fi
-
-    cd fd 
-    if ! cargo build --release && cargo install --path .; then
-        echo "failed to install fd"
-        exit 1
+    if ! command -v fd; then
+        cargo install fd-find
     fi
 fi
 

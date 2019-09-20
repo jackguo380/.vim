@@ -1,4 +1,7 @@
 #! /bin/bash
+set -e
+set -o pipefail
+
 # -- Compiled by Name --
 MYNAME="Jack Guo"
 
@@ -6,25 +9,15 @@ MYNAME="Jack Guo"
 REPO=https://github.com/vim/vim.git
 # Version to checkout
 # vim's master branch isn't too stable so its good use a known working version
-VER=v8.1.1099
+VER=master
 
-INSTALL_PREFIX=$HOME/.local
-VIM_RUNTIME_DIR=$INSTALL_PREFIX/share/vim/vim81
+# Install to a system directory rather than ~/.local so theres no broken
+# vim installations left over when moving distros while keeping /home
+INSTALL_PREFIX=/usr/local/guoj-vim
 
 # -- Compilation --
-if [ "${USE_CLANG:-false}" = 1 ] || [ "${USE_CLANG:-false}" = true ]; then
-    LLVM_DIR="${LLVM_DIR:-$HOME/.vim/clang+llvm-7.0.1-x86_64-linux-gnu-ubuntu-18.04}"
-    if [ ! -d "$LLVM_DIR" ]; then
-        echo "Cant use CLANG since its not downloaded"
-        exit 1
-    fi
-
-    export CC="$LLVM_DIR/bin/clang"
-    export CFLAGS="-Ofast -flto=thin -march=native"
-    export LDFLAGS="-fuse-ld=lld -Ofast -flto=thin -march=native -Wl,--lto-O3,--threads,--thinlto-jobs=$(nproc)"
-else
-    export CFLAGS="-Ofast -march=native" 
-fi
+# Do some optimization for fun and maybe get a bit of extra speed
+export CFLAGS="-Ofast -march=native"
 
 CONFIG_OPTS=(
     --enable-pythoninterp=no
@@ -100,7 +93,7 @@ do_configure() {
 do_compile() {
     make clean
 
-    make -j$(nproc) #VIMRUNTIMEDIR="$VIM_RUNTIME_DIR"
+    make -j$(nproc)
 
     if [ $? -ne 0 ]; then
         echo "Failed to make Vim"
@@ -110,22 +103,16 @@ do_compile() {
 
 do_install() {
     echo "Installing..."
-    make install
+    sudo make install
+
+    # Create some symlinks to .local
+    ln -s "$INSTALL_PREFIX/bin/vim" "$HOME/.local/bin/vim"
+    ln -s "$INSTALL_PREFIX/bin/vimdiff" "$HOME/.local/bin/vimdiff"
 
     if [ $? -ne 0 ]; then
         echo "Failed to install Vim"
         exit 1
     fi
-}
-
-do_alternatives() {
-    echo "Setting alternatives..."
-    sudo update-alternatives --install /usr/bin/editor editor "$INSTALL_PREFIX/bin/vim" 1
-    sudo update-alternatives --set editor "$INSTALL_PREFIX/bin/vim"
-    sudo update-alternatives --install /usr/bin/vi vi "$INSTALL_PREFIX/bin/vim" 1
-    sudo update-alternatives --set vi "$INSTALL_PREFIX/bin/vim"
-    sudo update-alternatives --install /usr/bin/vim vim "$INSTALL_PREFIX/bin/vim" 1
-    sudo update-alternatives --set vim "$INSTALL_PREFIX/bin/vim"
 }
 
 yn_prompt() {
@@ -167,20 +154,10 @@ if yn_prompt "install them [y/n]?"; then
     do_apt_packages
 fi
 
-while ! do_configure; do
-    if yn_prompt "Enter shell to install dependencies [y/n]?"; then
-        bash
-    else
-        exit 1
-    fi
-done
+do_configure
 
 do_compile
 
 if yn_prompt "Install [y/n]?"; then
     do_install
-fi
-
-if yn_prompt "Do update-alternatives [y/n]?"; then
-    do_alternatives
 fi
