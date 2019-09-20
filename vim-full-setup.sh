@@ -125,31 +125,34 @@ function compile_install {
 function apt_install {
     echo "Ubuntu 18.04 packages has a better vim than I can compile myself, installing via apt"
     sleep 2
-    if ! sudo apt install vim vim-gnome; then
+    if ! sudo apt-get install vim vim-gnome; then
         echo "Failed to install vim via apt"
         exit 1
     fi
 }
 
-# Do installation based on which platform we are on
-if [ "$yn" = y ]; then
-    source /etc/lsb-release
+PACKAGE_MANAGER=apt-get
 
-    if [ "$DISTRIB_ID" = LinuxMint ]; then
-        if [ ${DISTRIB_RELEASE:0:2} = 19 ]; then
-            apt_install
-        else
-            compile_install
-        fi
-    elif [ "$DISTRIB_ID" = Ubuntu ]; then
-        if [ ${DISTRIB_RELEASE:0:2} = 18 ]; then
-            apt_install
-        else
-            compile_install
-        fi
+# Do installation based on which platform we are on
+source /etc/lsb-release
+
+if [ "$DISTRIB_ID" = LinuxMint ]; then
+    if [ ${DISTRIB_RELEASE:0:2} = 19 ]; then
+        [ "$yn" = y ] && apt_install
     else
-        compile_install
+        [ "$yn" = y ] && compile_install
     fi
+elif [ "$DISTRIB_ID" = Ubuntu ]; then
+    if [ ${DISTRIB_RELEASE:0:2} = 18 ]; then
+        [ "$yn" = y ] && apt_install
+    else
+        [ "$yn" = y ] && compile_install
+    fi
+elif [ "$DISTRIB_ID" = ManjaroLinux ]; then
+    PACKAGE_MANAGER=pamac
+    [ "$yn" = y ] && compile_install
+else
+    [ "$yn" = y ] && compile_install
 fi
 
 if [ ! -f autoload/plug.vim ]; then
@@ -192,13 +195,21 @@ else
     ccache_args=()
 fi
 
-read -p "Install libncurses zlib via apt [y/n]?" yn
+read -p "Install libncurses zlib via $PACKAGE_MANAGER [y/n]?" yn
 if [ "$yn" = y ]; then
-    sudo apt install libncurses[0-9]-dev zlib1g-dev zlib1g
+    if [ $PACKAGE_MANAGER = "apt-get" ]; then
+        sudo apt-get install libncurses[0-9]-dev zlib1g-dev zlib1g
+    elif [ $PACKAGE_MANAGER = "pamac" ]; then
+        sudo pamac install zlib ncurses
+    fi
 fi
 
 # Need llvm for pretty much all the compiled plugins
-download_llvm
+if [ $PACKAGE_MANAGER = "pamac" ]; then
+    sudo pamac install llvm clang
+else
+    download_llvm
+fi
 
 cd "$ROOT_DIR"
 
@@ -270,14 +281,6 @@ else
     exit 1
 fi
 
-# Deoplete
-
-read -p "Install deoplete dependencies [y/n]?" yn
-if [ "$yn" = y ]; then
-    sudo apt install python3-pip python3-wheel
-    pip3 install pynvim
-fi
-
 cd "$ROOT_DIR"
 
 # Skip YCM for asyncomplete
@@ -338,11 +341,19 @@ if [ -d ./bundle/YouCompleteMe ]; then
     mkdir build
     cd build
 
-    cmake -DCMAKE_BUILD_TYPE=Release -DPATH_TO_LLVM_ROOT="$llvm_dir" \
-        -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" -DCMAKE_BUILD_RPATH="$llvm_dir/lib" . \
-        -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,$llvm_dir/lib" \
-        "$ROOT_DIR"/bundle/YouCompleteMe/third_party/ycmd/cpp "${ccache_args[@]}" -DUSE_PYTHON2=OFF &&
-        make -j$(nproc) ycm_core
+    if [ $PACKAGE_MANAGER = pamac ]; then
+        cmake -DCMAKE_BUILD_TYPE=Release \
+            -DPATH_TO_LLVM_ROOT=/usr \
+            "$ROOT_DIR"/bundle/YouCompleteMe/third_party/ycmd/cpp "${ccache_args[@]}" -DUSE_PYTHON2=OFF &&
+            make -j$(nproc) ycm_core
+    else
+        cmake -DCMAKE_BUILD_TYPE=Release -DPATH_TO_LLVM_ROOT="$llvm_dir" \
+            -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" -DCMAKE_BUILD_RPATH="$llvm_dir/lib" . \
+            -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,$llvm_dir/lib" \
+            "$ROOT_DIR"/bundle/YouCompleteMe/third_party/ycmd/cpp "${ccache_args[@]}" -DUSE_PYTHON2=OFF &&
+            make -j$(nproc) ycm_core
+    fi
+
     if [ $? -ne 0 ]; then
         echo "Failed to build ycmd"
         exit 1
@@ -364,7 +375,7 @@ if [ -d ./bundle/YouCompleteMe ]; then
 
     # Delete ycm's copy of libclang and force it to use the one we compiled cquery with
     cd "$ROOT_DIR"
-    rm -f bundle/YouCompleteMe/third_party/ycmd/libclang.so.7
+    rm -f bundle/YouCompleteMe/third_party/ycmd/libclang.so*
 fi
 
 echo "Everything was completed successfully!"
