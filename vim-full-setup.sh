@@ -61,8 +61,8 @@ fi
 echo "$CONFIG" > .config.txt
 
 # Downloaded LLVM
-LLVM_VER=clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04
-LLVM_URL=http://releases.llvm.org/8.0.0/$LLVM_VER.tar.xz
+LLVM_VER=clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04
+LLVM_URL=http://releases.llvm.org/9.0.0/$LLVM_VER.tar.xz
 
 function download_llvm {
     pushd "$ROOT_DIR"
