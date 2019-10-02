@@ -108,7 +108,13 @@ fi
 
 # Need llvm for pretty much all the compiled plugins
 if [ $PACKAGE_MANAGER = "pamac" ]; then
-    sudo pamac install llvm clang
+    if ! ( pamac list | grep llvm ); then
+        sudo pamac install llvm
+    fi
+
+    if ! ( pamac list | grep clang ); then
+        sudo pamac install clang
+    fi
 else
     download_llvm
 fi
