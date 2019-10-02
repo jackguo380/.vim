@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+set -o pipefail
 
 if ! which git; then
     echo "Please install git"
@@ -21,44 +22,23 @@ ROOT_DIR="$PWD"
 
 function usage {
 cat <<EOF
-Usage: $0 -c <config> -l <language server>
--c <config>
-Configs:
-ycm - use YCM
-nocompile - install only vimscript plugins
-windows - only stuff that works in windows, (currently an alias for nocompile)
+Usage: $0
 
 EOF
 }
 
-CONFIG=none
-
 while getopts "l:c:h" opt; do 
     case $opt in
-        c)
-            case "$OPTARG" in
-                ycm) CONFIG="$OPTARG" ;;
-                nocompile) CONFIG="$OPTARG" ;;
-                windows) CONFIG="nocompile" ;;
-                *) echo "Invalid config: $OPTARG" ; exit 1 ;;
-            esac
-            ;;
         h)
             usage
             exit 0
             ;;
         *)
-            echo "Invalid option: $OPTARG"; exit 1 ;;
+            echo "Invalid option: $OPTARG"
+            usage
+            exit 1 ;;
     esac
 done
-
-if [ "$CONFIG" = none ]; then
-    usage
-    echo "A configuration must be specified"
-    exit 1
-fi
-
-echo "$CONFIG" > .config.txt
 
 # Downloaded LLVM
 LLVM_VER=clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04
@@ -98,24 +78,10 @@ else
     exit 1
 fi
 
-if [ ! -f autoload/plug.vim ]; then
-    curl -fLo autoload/plug.vim --create-dirs \
-        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    if [ $? -ne 0 ]; then
-        echo "Failed to download vim-plug"
-        exit 1
-    fi
-fi
-
 cd "$ROOT_DIR"
 
 # Run vundle to configure all plugins, ignore the errors from this
 vim +PlugUpdate +qall
-
-if [ "$CONFIG" = nocompile ]; then
-    echo Everything is done for nocompile
-    exit 0
-fi
 
 if ! which cmake; then
     echo "Please install cmake"
@@ -187,18 +153,33 @@ fi
 
 rustok=false
 if command -v rustup && command -v cargo; then
-    echo "rustup and cargo is required for rust, skipping rust config"
     rustok=true
+else
+    echo "rustup and cargo is required for rust, skipping rust config"
 fi
 
 cd "$ROOT_DIR"
 if $rustok; then
-    rustup install nightly
-    rustup component add --toolchain stable rls rust-analysis rust-src
-    rustup component add --toolchain nightly rls rust-analysis rust-src
+    if ! ( rustup show | grep "nightly" ); then
+        rustup install nightly
+    fi
+
+    for comp in rls rust-analysis rust-src; do
+        if rustup component list | grep "$comp"; then
+            echo "$comp is installed"
+        else
+            rustup component add "$comp"
+        fi
+
+        if rustup component list --toolchain nightly | grep "$comp"; then
+            echo "$comp is installed (nightly)"
+        else
+            rustup component add --toolchain nightly "$comp"
+        fi
+    done
 
     # Install fd
-    if ! command -v fd; then
+    if ! ( cargo install --list | grep fd-find ); then
         cargo install fd-find
     fi
 fi

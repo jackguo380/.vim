@@ -37,9 +37,6 @@ let g:LanguageClient_serverCommands = {}
 let g:LanguageClient_rootMarkers = {}
 
 " Debug Logging
-let g:lsp_log_verbose = 1
-let g:lsp_log_file = '/tmp/vim-lsp.log'
-
 let g:lsp_cxx_hl_log_file = '/tmp/lsp-cxx-hl.log'
 
 let g:lsp_cxx_hl_use_text_props = 1
@@ -48,36 +45,28 @@ let g:LanguageClient_loggingFile = '/tmp/languageclient.log'
 " For large files this is a more appropriate timeout
 let g:LanguageClient_waitOutputTimeout = 30
 
-" Enable diagnostic signs
-"let g:lsp_signs_enabled = 0 Disabled until its a bit less annoying
-let g:lsp_diagnostics_echo_cursor = 1
-" Only use lsp diagnostics if YCM is disabled
-autocmd FileType c,cpp let g:lsp_diagnostics_echo_cursor = ! config_use_ycm
 autocmd FileType c,cpp let g:LanguageClient_diagnosticsEnable = 0
 
-let g:lsp_signs_error = {'text': '✘'}
-let g:lsp_signs_warning = {'text': '‼'}
-let g:lsp_signs_hint = {'text': '❓'}
-
 if executable('pyls')
-    " pip install python-language-server
-    au User lsp_setup call lsp#register_server({
-        \ 'name': 'pyls',
-        \ 'cmd': {server_info->['pyls']},
-        \ 'whitelist': ['python'],
-        \ })
-
     let g:LanguageClient_serverCommands['python'] = ['pyls']
 endif
 
 " Rust language server
 let s:rust_command = []
 if executable('rustup')
-    silent call system('rustup run nightly rls --version')
+    " Use a special marker file to indicate the use of nightly rls
+    let s:allow_nightly = filereadable(g:my_project_root . '/.rls_use_nightly')
 
-    if v:shell_error == 0
-        let s:rust_command = ['rustup', 'run', 'nightly', 'rls']
-    else
+    if s:allow_nightly
+        silent call system('rustup run nightly rls --version')
+
+        if v:shell_error == 0
+            let s:rust_command = ['rustup', 'run', 'nightly', 'rls']
+        endif
+    endif
+
+    " Always try stable incase nightly was not installed
+    if len(s:rust_command) == 0
         silent call system('rustup run stable rls --version')
 
         if v:shell_error == 0
@@ -91,8 +80,10 @@ if len(s:rust_command) > 0
     let g:LanguageClient_rootMarkers['rust'] = ['.rls-root']
 endif
 
-let s:cquery_lang_server_executable = [$VIMHOME . "/cquery/build/release/bin/cquery"]
-let s:ccls_lang_server_executable = [$VIMHOME . "/ccls/build/release/bin/ccls"]
+let s:cquery_lang_server_executable = [g:my_vim_directory 
+            \ . "/cquery/build/release/bin/cquery"]
+let s:ccls_lang_server_executable = [g:my_vim_directory
+            \ . "/ccls/build/release/bin/ccls"]
 
 if executable(s:cquery_lang_server_executable[0])
     " Search upwards for .cquery_root marker
@@ -102,7 +93,7 @@ if executable(s:cquery_lang_server_executable[0])
     if s:cquery_root_dir != ''
         let s:cquery_root_dir = fnamemodify(s:cquery_root_dir, ':p:h')
     else
-        let s:cquery_root_dir = FindProjectRoot()
+        let s:cquery_root_dir = g:my_project_root
     endif
 
     let s:cquery_settings = {
@@ -126,7 +117,7 @@ elseif executable(s:ccls_lang_server_executable[0])
     if s:ccls_root_dir != ''
         let s:ccls_root_dir = fnamemodify(s:ccls_root_dir, ':p:h')
     else
-        let s:ccls_root_dir = FindProjectRoot()
+        let s:ccls_root_dir = g:my_project_root
     endif
 
     let s:ccls_settings = {

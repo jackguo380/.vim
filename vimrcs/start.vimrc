@@ -30,28 +30,9 @@ function! FindProjectRoot(...)
     return fnameescape(len(wdlist) == 0 ? getcwd() : wdlist[0])
 endfunction
 
+let g:my_project_root = FindProjectRoot()
+
 augroup startprojectroot
     autocmd!
-    autocmd VimEnter * exe 'cd ' . FindProjectRoot()
+    autocmd VimEnter * exe 'cd ' . g:my_project_root
 augroup END
-
-" Configuration
-if filereadable($VIMHOME . "/.config.txt")
-    let my_config = readfile($VIMHOME . "/.config.txt")[0]
-else
-    echoerr "No Vimrc Configuration Found!"
-    let my_config = "nocompile"
-endif
-
-if my_config ==# "ycm"
-    let config_use_ycm = 1
-    let config_use_cquery = 1
-else
-    if my_config !=# "nocompile"
-        echoerr "Bad Vimrc Configuration: " . my_config
-        let my_config = "nocompile"
-    endif
-
-    let config_use_ycm = 0
-    let config_use_cquery = 0
-endif

@@ -220,7 +220,7 @@ def Settings( **kwargs ):
   filename = kwargs['filename']
 
   try:
-    project_root = kwargs['client_data']['g:ycm_guoj_project_root']
+    project_root = kwargs['client_data']['g:my_project_root']
   except KeyError:
     project_root = working_directory
 

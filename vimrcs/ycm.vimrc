@@ -14,11 +14,14 @@ let g:ycm_server_python_interpreter = 'python3'
 set completeopt-=preview
 
 let g:ycm_log_level = 'debug'
-let g:ycm_guoj_project_root = FindProjectRoot()
-let g:ycm_extra_conf_vim_data = ['g:ycm_guoj_project_root']
+let g:ycm_extra_conf_vim_data = ['g:my_project_root']
 
-if executable($VIMHOME . '/clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04/bin/clangd')
-    let g:ycm_clangd_binary_path = $VIMHOME . '/clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04/bin/clangd'
+let s:clangd_exec = g:my_vim_directory 
+            \ . '/clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04/bin/clangd'
+if executable(s:clangd_exec)
+    let g:ycm_clangd_binary_path = s:clangd_exec
+elseif executable('clangd')
+    let g:ycm_clangd_binary_path = 'clangd'
 endif
 
 

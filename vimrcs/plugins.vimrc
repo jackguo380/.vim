@@ -1,4 +1,22 @@
-call plug#begin($VIMHOME . '/bundle')
+" Some extra non-github plugins
+function! s:curl_plugin(name, url)
+    let curl_opts = "--create-dirs -fLo"
+    let full_name = g:my_vim_directory . '/'
+		\ . substitute(
+		\ substitute(a:name, "['\"]$", "", ""),
+		\ "^[\"']", "", "")
+
+    if ! filereadable(full_name)
+	exe "!echo CurlPlug: Downloading: " . a:name
+	exe "!curl" curl_opts full_name a:url 
+	exe "!echo CurlPlug: Done Downloading: " . a:name
+    endif
+endfunction
+command -nargs=+ CurlPlug silent call s:curl_plugin(<f-args>)
+
+CurlPlug "autoload/plug.vim" 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
+call plug#begin(g:my_vim_directory . '/bundle')
 
 Plug 'junegunn/vim-plug'
 
@@ -8,10 +26,8 @@ Plug 'tpope/vim-sleuth'
 " Various useful configurations
 Plug 'tpope/vim-sensible'
 
-if config_use_ycm
-    " Smart text/code completion, needs to be compiled
-    Plug 'Valloric/YouCompleteMe' 
-endif
+" Smart text/code completion, needs to be compiled
+Plug 'Valloric/YouCompleteMe' 
 
 " Language server support
 Plug 'autozimu/LanguageClient-neovim', {
@@ -19,15 +35,9 @@ Plug 'autozimu/LanguageClient-neovim', {
 	    \ 'do': 'bash install.sh'
 	    \ }
 
-" Language server extension for Cquery
-Plug 'jackguo380/vim-lsp-cquery', {
-	    \ 'branch': 'ccls',
-	    \ 'for': ['c', 'cpp']
-	    \ }
-
 " Language server highlighting
-"Plug 'jackguo380/vim-lsp-cxx-highlight', {
-Plug '~/Documents/Github/vim-lsp-cxx-highlight', {
+"Plug '~/Documents/Github/vim-lsp-cxx-highlight', {
+Plug 'jackguo380/vim-lsp-cxx-highlight', {
 	    \ 'for': ['c', 'cpp']
 	    \ }
 
@@ -49,9 +59,6 @@ Plug 'scrooloose/nerdtree'
 
 " Status Bar
 Plug 'vim-airline/vim-airline'
-
-" x86 Highlighting
-"Plug 'shirk/vim-gas'
 
 " Git Integration
 Plug 'tpope/vim-fugitive'
@@ -100,19 +107,6 @@ Plug 'lervag/vimtex', {
 	    \ }
 
 call plug#end()
-
-" Some extra non-github plugins
-function! s:curl_plugin(name, url)
-    let curl_opts = "--create-dirs -fLo"
-    let full_name = $VIMHOME . '/' . substitute(substitute(a:name, "['\"]$", "", ""), "^[\"']", "", "")
-
-    if ! filereadable(full_name)
-	exe "!echo CurlPlug: Downloading: " . a:name
-	exe "!curl" curl_opts full_name a:url 
-	exe "!echo CurlPlug: Done Downloading: " . a:name
-    endif
-endfunction
-command -nargs=+ CurlPlug silent call s:curl_plugin(<f-args>)
 
 " Set wildignore from gitignore
 "CurlPlug 'plugin/gitignore.vim' 'https://www.vim.org/scripts/download_script.php?src_id=25252'

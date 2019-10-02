@@ -2,9 +2,9 @@ set nocompatible
 set encoding=utf-8
 
 if has('win32') || has ('win64')
-    let $VIMHOME = $HOME."/vimfiles"
+    let g:my_vim_directory = $HOME."/vimfiles"
 else
-    let $VIMHOME = $HOME."/.vim"
+    let g:my_vim_directory = $HOME."/.vim"
 endif
 
 runtime vimrcs/start.vimrc
@@ -15,9 +15,7 @@ syntax on
 let mapleader = ","
 
 runtime vimrcs/airline.vimrc
-runtime vimrcs/cscope-extra.vimrc
 runtime vimrcs/ycm.vimrc
-runtime vimrcs/regexhelpers.vimrc
 runtime vimrcs/fzf.vimrc
 runtime vimrcs/language_servers.vimrc
 runtime vimrcs/misc_helpers.vimrc
