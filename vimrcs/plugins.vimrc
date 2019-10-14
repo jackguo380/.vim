@@ -109,6 +109,9 @@ Plug 'lervag/vimtex', {
 " arm asm syntax
 Plug 'ARM9/arm-syntax-vim'
 
+" Edit gpg encrypted files
+Plug 'jamessan/vim-gnupg'
+
 call plug#end()
 
 " Set wildignore from gitignore
