@@ -106,6 +106,9 @@ Plug 'lervag/vimtex', {
 	    \ 'for': ['tex']
 	    \ }
 
+" arm asm syntax
+Plug 'ARM9/arm-syntax-vim'
+
 call plug#end()
 
 " Set wildignore from gitignore
