@@ -128,9 +128,12 @@ elseif executable(s:ccls_lang_server_executable[0])
     let s:ccls_exec = s:ccls_lang_server_executable + ['-init=' . json_encode(s:ccls_settings)]
     let g:LanguageClient_serverCommands['c'] = s:ccls_exec
     let g:LanguageClient_serverCommands['cpp'] = s:ccls_exec
-    let g:LanguageClient_serverCommands['opencl'] = s:ccls_exec
     let g:LanguageClient_rootMarkers['c'] = ['compile_commands.json', '.ccls_root']
     let g:LanguageClient_rootMarkers['cpp'] = ['compile_commands.json', '.ccls_root']
-    let g:LanguageClient_rootMarkers['opencl'] = ['compile_commands.json', '.ccls_root']
 endif
 
+if executable('clangd')
+    "let g:LanguageClient_serverStderr = '/tmp/clangd.stderr'
+    let g:LanguageClient_serverCommands['opencl'] = ['clangd', '--log=verbose']
+    let g:LanguageClient_rootMarkers['opencl'] = ['compile_commands.json', 'compile_flags.txt', '.clangd_root']
+endif

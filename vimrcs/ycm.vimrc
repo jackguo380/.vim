@@ -16,11 +16,7 @@ set completeopt-=preview
 let g:ycm_log_level = 'debug'
 let g:ycm_extra_conf_vim_data = ['g:my_project_root']
 
-let s:clangd_exec = g:my_vim_directory 
-            \ . '/clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04/bin/clangd'
-if executable(s:clangd_exec)
-    let g:ycm_clangd_binary_path = s:clangd_exec
-elseif executable('clangd')
+if executable('clangd')
     let g:ycm_clangd_binary_path = 'clangd'
 endif
 
