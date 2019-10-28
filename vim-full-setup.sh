@@ -41,7 +41,7 @@ while getopts "l:c:h" opt; do
 done
 
 # Downloaded LLVM
-LLVM_VER=clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04
+LLVM_VER=clang+llvm-9.0.0-x86_64-pc-linux-gnu
 LLVM_URL=http://releases.llvm.org/9.0.0/$LLVM_VER.tar.xz
 
 function download_llvm {
@@ -116,7 +116,10 @@ if [ $PACKAGE_MANAGER = "pamac" ]; then
         sudo pamac install clang
     fi
 else
-    download_llvm
+    if ! dpkg -l llvm llvm-dev clang libclang-dev > /dev/null; then
+        sudo apt install llvm llvm-dev clang libclang-dev
+    fi
+    #download_llvm
 fi
 
 cd "$ROOT_DIR"

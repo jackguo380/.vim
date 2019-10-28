@@ -109,6 +109,9 @@ Plug 'lervag/vimtex', {
 " arm asm syntax
 Plug 'ARM9/arm-syntax-vim'
 
+" OpenCL syntax
+Plug 'brgmnn/vim-opencl'
+
 " Edit gpg encrypted files
 Plug 'jamessan/vim-gnupg'
 

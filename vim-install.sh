@@ -48,6 +48,7 @@ libperl-dev
 #libpython-dev
 libpython3-dev
 libx11-dev libxpm-dev libxt-dev
+libtinfo-dev
 )
 
 do_git_clone() {
@@ -106,7 +107,9 @@ do_install() {
     sudo make install
 
     # Create some symlinks to .local
+    rm -f "$HOME/.local/bin/vim"
     ln -s "$INSTALL_PREFIX/bin/vim" "$HOME/.local/bin/vim"
+    rm -f "$HOME/.local/bin/vimdiff"
     ln -s "$INSTALL_PREFIX/bin/vimdiff" "$HOME/.local/bin/vimdiff"
 
     if [ $? -ne 0 ]; then
