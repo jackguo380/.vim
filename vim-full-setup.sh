@@ -120,6 +120,10 @@ else
         sudo apt install llvm llvm-dev clang libclang-dev
     fi
     #download_llvm
+    if ! llvm_dir=$(llvm-config --prefix); then
+        echo "llvm-config not found!"
+        exit 1
+    fi
 fi
 
 cd "$ROOT_DIR"
@@ -183,7 +187,8 @@ if $rustok; then
         if rustup component list --toolchain nightly | grep "$comp"; then
             echo "$comp is installed (nightly)"
         else
-            rustup component add --toolchain nightly "$comp"
+            echo
+            #rustup component add --toolchain nightly "$comp"
         fi
     done
 
