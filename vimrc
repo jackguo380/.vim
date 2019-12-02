@@ -7,19 +7,19 @@ else
     let g:my_vim_directory = $HOME."/.vim"
 endif
 
-runtime vimrcs/start.vimrc
-runtime vimrcs/plugins.vimrc
+runtime vimrcs/start.vim
+runtime vimrcs/plugins.vim
 
 filetype plugin indent on
 syntax on
 let mapleader = ","
 
-runtime vimrcs/airline.vimrc
-runtime vimrcs/ycm.vimrc
-runtime vimrcs/fzf.vimrc
-runtime vimrcs/language_servers.vimrc
-runtime vimrcs/misc_helpers.vimrc
-runtime vimrcs/nerdtree.vimrc
+runtime vimrcs/airline.vim
+runtime vimrcs/ycm.vim
+runtime vimrcs/fzf.vim
+runtime vimrcs/language_servers.vim
+runtime vimrcs/misc_helpers.vim
+runtime vimrcs/nerdtree.vim
 
 " TODO: remove commented out settings after testing sensible.vim
 "set autoindent
@@ -69,5 +69,5 @@ let g:netrw_banner = 0 "remove banner
 "let g:netrw_browse_split = 2
 let g:netrw_liststyle = 3 " Use the nice tree style listing
 
-runtime vimrcs/colorscheme.vimrc
+runtime vimrcs/colorscheme.vim
 
