@@ -30,7 +30,8 @@ CONFIG_OPTS=(
     --enable-autoservername 
     --enable-terminal
     #--enable-gui=gtk3
-    --enable-gtk3-check
+    #--enable-gtk3-check
+    --disable-gtktest
     --with-features=huge 
     --with-x 
     --enable-fontset 
