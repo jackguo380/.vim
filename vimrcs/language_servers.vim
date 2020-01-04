@@ -45,6 +45,8 @@ let g:LanguageClient_loggingFile = '/tmp/languageclient.log'
 " For large files this is a more appropriate timeout
 let g:LanguageClient_waitOutputTimeout = 30
 
+let g:LanguageClient_diagnosticsEnable = 1
+
 autocmd FileType c,cpp let g:LanguageClient_diagnosticsEnable = 0
 
 if executable('pyls')
@@ -53,7 +55,12 @@ endif
 
 " Rust language server
 let s:rust_command = []
-if executable('rustup')
+
+if executable('ra_lsp_server')
+    let s:rust_command = ['ra_lsp_server']
+endif
+
+if len(s:rust_command) > 0 && executable('rustup')
     " Use a special marker file to indicate the use of nightly rls
     let s:allow_nightly = filereadable(g:my_project_root . '/.rls_use_nightly')
 

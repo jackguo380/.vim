@@ -14,6 +14,7 @@ filetype plugin indent on
 syntax on
 let mapleader = ","
 
+runtime vimrcs/mucomplete.vim
 runtime vimrcs/airline.vim
 runtime vimrcs/ycm.vim
 runtime vimrcs/fzf.vim

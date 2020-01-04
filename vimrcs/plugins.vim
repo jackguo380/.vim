@@ -27,7 +27,10 @@ Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-sensible'
 
 " Smart text/code completion, needs to be compiled
-Plug 'Valloric/YouCompleteMe' 
+"Plug 'Valloric/YouCompleteMe' 
+
+" Completion
+Plug 'lifepillar/vim-mucomplete'
 
 " Language server support
 Plug 'autozimu/LanguageClient-neovim', {

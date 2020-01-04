@@ -27,3 +27,4 @@ fd
 clang+llvm-9.0.0-x86_64-pc-linux-gnu
 clang+llvm-9.0.0-x86_64-pc-linux-gnu.tar.xz
 coc-settings.json
+rust-analyzer/
