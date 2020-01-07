@@ -146,7 +146,13 @@ if executable('clangd')
 endif
 
 if isdirectory(g:my_vim_directory . '/eclipse.jdt.ls/target')
-    let s:jdtls_exec = [g:my_vim_directory . '/jdtls', '-data', g:my_project_root . '.jdtls_data' ]
+    let s:jdtls_data_dir = g:my_project_root . '/.jdtls_data'
+
+    if !isdirectory(s:jdtls_data_dir)
+        call mkdir(s:jdtls_data_dir, 'p')
+    endif
+
+    let s:jdtls_exec = [g:my_vim_directory . '/jdtls', '-data', s:jdtls_data_dir]
 
     let g:LanguageClient_serverCommands['java'] = s:jdtls_exec
 endif
