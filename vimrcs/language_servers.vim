@@ -145,7 +145,7 @@ if executable('clangd')
     let g:LanguageClient_rootMarkers['opencl'] = ['compile_commands.json', 'compile_flags.txt', '.clangd_root']
 endif
 
-if isdirectory(g:my_vim_directory . '/eclipse.jdt.ls/target')
+if isdirectory(g:my_vim_directory . '/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target')
     let s:jdtls_data_dir = g:my_project_root . '/.jdtls_data'
 
     if !isdirectory(s:jdtls_data_dir)
