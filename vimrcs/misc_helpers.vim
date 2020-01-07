@@ -7,6 +7,7 @@ if executable('ag')
     let s:aggrep .= ' --ignore .cquery_cache'
     let s:aggrep .= ' --ignore .ccls_cache'
     let s:aggrep .= ' --ignore .clangd'
+    let s:aggrep .= ' --ignore .jdtls_data'
     let s:aggrep .= ' --ignore "*.pyc"'
     let s:aggrep .= ' --ignore "*.o"'
     let s:aggrep .= ' --ignore "*.d"'

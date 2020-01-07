@@ -144,3 +144,9 @@ if executable('clangd')
     let g:LanguageClient_serverCommands['opencl'] = ['clangd', '--log=verbose']
     let g:LanguageClient_rootMarkers['opencl'] = ['compile_commands.json', 'compile_flags.txt', '.clangd_root']
 endif
+
+if isdirectory(g:my_vim_directory . '/eclipse.jdt.ls/target')
+    let s:jdtls_exec = [g:my_vim_directory . '/jdtls', '-data', g:my_project_root . '.jdtls_data' ]
+
+    let g:LanguageClient_serverCommands['java'] = s:jdtls_exec
+endif
