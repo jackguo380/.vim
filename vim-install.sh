@@ -54,53 +54,27 @@ libtinfo-dev
 
 do_git_clone() {
     git clone "$REPO" vim
-    
-    if [ $? -ne 0 ]; then
-        echo "Failed to git clone Vim"
-        exit 1
-    fi
 }
 
 do_git_checkout() {
     # Ensure all recent versions are here
     git pull
     git checkout "$VER"
-
-    if [ $? -ne 0 ]; then
-        echo "Failed to checkout $VER"
-        exit 1
-    fi
 }
 
 do_apt_packages() {
     sudo apt install "${UBUNTU_APT_PKGS[@]}"
-
-    if [ $? -ne 0 ]; then
-        echo "Failed to do apt install"
-        exit 1
-    fi
 }
 
 do_configure() {
     make clean distclean
     ./configure "${CONFIG_OPTS[@]}"
-
-    if [ $? -ne 0 ]; then
-        echo "Failed to configure Vim"
-        return 1
-    fi
-
 }
 
 do_compile() {
     make clean
 
     make -j$(nproc)
-
-    if [ $? -ne 0 ]; then
-        echo "Failed to make Vim"
-        exit 1
-    fi
 }
 
 do_install() {
@@ -112,11 +86,6 @@ do_install() {
     ln -s "$INSTALL_PREFIX/bin/vim" "$HOME/.local/bin/vim"
     rm -f "$HOME/.local/bin/vimdiff"
     ln -s "$INSTALL_PREFIX/bin/vimdiff" "$HOME/.local/bin/vimdiff"
-
-    if [ $? -ne 0 ]; then
-        echo "Failed to install Vim"
-        exit 1
-    fi
 }
 
 yn_prompt() {

@@ -2,9 +2,6 @@
 set -e
 set -o pipefail
 
-# -- Compiled by Name --
-MYNAME="Jack Guo"
-
 # -- Git --
 REPO=https://github.com/neovim/neovim.git
 
@@ -55,11 +52,6 @@ do_git_checkout() {
     # Ensure all recent versions are here
     git fetch origin tag stable
     git checkout stable
-
-    if [ $? -ne 0 ]; then
-        echo "Failed to checkout $VER"
-        exit 1
-    fi
 }
 
 do_apt_packages() {
@@ -95,11 +87,6 @@ do_install() {
     # Create some symlinks to .local
     rm -f "$HOME/.local/bin/nvim"
     ln -s "$INSTALL_PREFIX/bin/nvim" "$HOME/.local/bin/nvim"
-
-    if [ $? -ne 0 ]; then
-        echo "Failed to install Neovim"
-        exit 1
-    fi
 }
 
 yn_prompt() {
