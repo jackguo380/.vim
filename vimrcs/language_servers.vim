@@ -1,20 +1,5 @@
 " Language Server Configuration
 
-" Key Mappings
-" vim-lsp
-"nmap csfg :LspDefinition<CR>
-"nmap csfs :LspReferences<CR>
-"nmap csfi :LspImplementation<CR>
-"nmap csft :LspTypeDefinition<CR>
-"nmap csfh :LspHover<CR>
-"nmap <leader>d :LspDocumentDiagnostics<CR>
-
-" cquery/ccls specific
-"nmap csfc :LspCqueryCallers<CR>
-"nmap csfv :LspCqueryVars<CR>
-"nmap csfd :LspCqueryDerived<CR>
-"nmap csfb :LspCqueryBase<CR>
-
 " LanguageClient
 nmap csfg :call LanguageClient#textDocument_definition()<CR>
 nmap csfs :call LanguageClient#textDocument_references()<CR>

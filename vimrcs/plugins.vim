@@ -26,9 +26,6 @@ Plug 'tpope/vim-sleuth'
 " Various useful configurations
 Plug 'tpope/vim-sensible'
 
-" Smart text/code completion, needs to be compiled
-"Plug 'Valloric/YouCompleteMe' 
-
 " Completion
 Plug 'lifepillar/vim-mucomplete'
 
@@ -41,11 +38,6 @@ Plug 'autozimu/LanguageClient-neovim', {
 " Language server highlighting
 "Plug '~/Documents/Github/vim-lsp-cxx-highlight', {
 Plug 'jackguo380/vim-lsp-cxx-highlight', {
-	    \ 'for': ['c', 'cpp']
-	    \ }
-
-" C++ Keywords
-Plug 'bfrg/vim-cpp-modern', {
 	    \ 'for': ['c', 'cpp']
 	    \ }
 
@@ -64,10 +56,14 @@ Plug 'scrooloose/nerdtree'
 Plug 'vim-airline/vim-airline'
 
 " Git Integration
-Plug 'tpope/vim-fugitive'
+if isdirectory(g:my_project_root . '/.git')
+    Plug 'tpope/vim-fugitive'
+endif
 
 " Mercurial Integration
-Plug 'jlfwong/vim-mercenary'
+if isdirectory(g:my_project_root . '/.hg')
+    Plug 'jlfwong/vim-mercenary'
+endif
 
 " Python indentation
 Plug 'vim-scripts/indentpython.vim'
@@ -119,9 +115,6 @@ Plug 'brgmnn/vim-opencl'
 Plug 'jamessan/vim-gnupg'
 
 call plug#end()
-
-" Set wildignore from gitignore
-"CurlPlug 'plugin/gitignore.vim' 'https://www.vim.org/scripts/download_script.php?src_id=25252'
 
 " CMake syntax
 CurlPlug "syntax/cmake.vim" 'https://raw.githubusercontent.com/Kitware/CMake/master/Auxiliary/vim/syntax/cmake.vim'

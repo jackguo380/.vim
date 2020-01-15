@@ -16,7 +16,6 @@ let mapleader = ","
 
 runtime vimrcs/mucomplete.vim
 runtime vimrcs/airline.vim
-runtime vimrcs/ycm.vim
 runtime vimrcs/fzf.vim
 runtime vimrcs/language_servers.vim
 runtime vimrcs/misc_helpers.vim
@@ -64,11 +63,6 @@ nnoremap <leader>rh :reg 0 1 2 3 4 5 6 7 8 9<CR>
 
 " Paste in visual mode without yanking with P
 xnoremap <expr> P '"_d"'.v:register.'P'
-
-"File Browser Config
-let g:netrw_banner = 0 "remove banner
-"let g:netrw_browse_split = 2
-let g:netrw_liststyle = 3 " Use the nice tree style listing
 
 runtime vimrcs/colorscheme.vim
 

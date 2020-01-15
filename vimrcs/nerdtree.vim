@@ -9,7 +9,3 @@ nmap <leader>nf :NERDTreeFocus<CR>
 nmap <leader>ng :NERDTree %<CR>
 nmap <leader>nb :NERDTreeFind %<CR>
 nmap <leader>nc :NERDTreeCWD<CR>
-
-" Open automatically if vim starts up with no files
-"autocmd StdinReadPre * let s:std_in=1
-"autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
