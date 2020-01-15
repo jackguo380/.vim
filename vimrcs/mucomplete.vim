@@ -1,7 +1,11 @@
 " MUcomplete
 
 set complete=.,w,b,u,k
-set completeopt=menu,popup,menuone,noselect
+if has('textprop')
+    set completeopt=menu,popup,menuone,noselect
+else
+    set completeopt=menu,menuone,noselect
+endif
 
 let g:mucomplete#enable_auto_at_startup = 1
 
