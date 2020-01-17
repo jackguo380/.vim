@@ -15,6 +15,13 @@ hi! link StorageClass Statement
 " Fix vim-cpp-modern highlighting namespaces same as enums
 hi! link cppSTLnamespace Namespace
 
+hi! JavaStaticMemberFunction ctermfg=Green cterm=none guifg=Green gui=none
+hi! JavaMemberVariable ctermfg=White cterm=italic guifg=White gui=italic
+
+hi! CppEnumConstant ctermfg=Magenta guifg=#AD7FA8 cterm=none gui=none
+hi! CppNamespace ctermfg=Yellow guifg=#BBBB00 cterm=none gui=none
+hi! CppMemberVariable ctermfg=White guifg=White
+
 " Disable highlighting of functions in vim-cpp-modern
 let g:cpp_no_function_highlight = 1
 

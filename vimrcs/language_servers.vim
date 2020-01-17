@@ -20,6 +20,7 @@ let g:LanguageClient_selectionUI = 'quickfix'
 
 let g:LanguageClient_serverCommands = {}
 let g:LanguageClient_rootMarkers = {}
+let g:LanguageClient_semanticHighlightMaps = {}
 
 " Debug Logging
 let g:lsp_cxx_hl_log_file = '/tmp/lsp-cxx-hl.log'
@@ -28,6 +29,7 @@ let g:lsp_cxx_hl_use_text_props = 1
 
 let g:LanguageClient_loggingFile = '/tmp/languageclient.log'
 "let g:LanguageClient_loggingLevel = 'DEBUG'
+"let g:LanguageClient_loggingLevel = 'INFO'
 
 " For large files this is a more appropriate timeout
 let g:LanguageClient_waitOutputTimeout = 30
@@ -130,6 +132,18 @@ if executable('clangd')
     "let g:LanguageClient_serverStderr = '/tmp/clangd.stderr'
     let g:LanguageClient_serverCommands['opencl'] = ['clangd', '--log=verbose']
     let g:LanguageClient_rootMarkers['opencl'] = ['compile_commands.json', 'compile_flags.txt', '.clangd_root']
+
+    "let g:LanguageClient_serverCommands['cpp'] = ['clangd', '--log=verbose']
+    "let g:LanguageClient_semanticHighlightMaps['cpp'] = [
+    "            \ {'Function': ['entity.name.function.cpp']},
+    "            \ {'Function': ['entity.name.function.method.cpp']},
+    "            \ {'CppNamespace': ['entity.name.namespace.cpp']},
+    "            \ {'CppEnumConstant': ['variable.other.enummember.cpp']},
+    "            \ {'CppMemberVariable': ['variable.other.field.cpp']},
+    "            \ {'Type': ['entity.name.type.class.cpp']},
+    "            \ {'Type': ['entity.name.type.enum.cpp']},
+    "            \ {'Type': ['entity.name.type.template.cpp']},
+    "            \ ]
 endif
 
 if isdirectory(g:my_vim_directory . '/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target')
@@ -142,4 +156,13 @@ if isdirectory(g:my_vim_directory . '/eclipse.jdt.ls/org.eclipse.jdt.ls.product/
     let s:jdtls_exec = [g:my_vim_directory . '/jdtls', '-data', s:jdtls_data_dir]
 
     let g:LanguageClient_serverCommands['java'] = s:jdtls_exec
+
+    let g:LanguageClient_semanticHighlightMaps['java'] = [
+                \ {"JavaStaticMemberFunction": ['storage.modifier.static.java', 'entity.name.function.java', '**']},
+                \ {"JavaMemberVariable": ['meta.definition.variable.java', 'meta.class.body.java', 'meta.class.java', '**']},
+                \ {"Function": ['entity.name.function.java', '**']},
+                \ {"Function": ['*', 'entity.name.function.java', '**']},
+                \ {"Type": ['entity.name.type.class.java', '**']},
+                \ {"Type": ['*', 'entity.name.type.class.java', '**']},
+                \ ]
 endif
