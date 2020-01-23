@@ -41,7 +41,7 @@ while getopts "l:c:h" opt; do
 done
 
 # Downloaded LLVM
-LLVM_VER=clang+llvm-9.0.0-x86_64-pc-linux-gnu
+LLVM_VER=clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04
 LLVM_URL=http://releases.llvm.org/9.0.0/$LLVM_VER.tar.xz
 
 function download_llvm {
@@ -116,11 +116,11 @@ if [ $PACKAGE_MANAGER = "pamac" ]; then
         sudo pamac install clang
     fi
 else
-    if ! dpkg -l llvm llvm-dev clang libclang-dev > /dev/null; then
-        sudo apt install llvm llvm-dev clang libclang-dev
+    if ! dpkg -l llvm-9 llvm-9-dev clang-9 libclang-9-dev > /dev/null; then
+        sudo apt install llvm-9 llvm-9-dev clang-9 libclang-9-dev
     fi
     #download_llvm
-    if ! llvm_dir=$(llvm-config --prefix); then
+    if ! llvm_dir=$(llvm-config-9 --prefix); then
         echo "llvm-config not found!"
         exit 1
     fi

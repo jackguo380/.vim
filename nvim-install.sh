@@ -14,6 +14,7 @@ INSTALL_PREFIX=/usr/local/guoj-nvim
 THIRDPARTY_CONFIG_OPTS=(
     -DUSE_BUNDLED=OFF
     -DUSE_BUNDLED_LUV=ON
+    -DUSE_BUNDLED_LIBUV=ON
     -DUSE_BUNDLED_LIBVTERM=ON
     -DCMAKE_BUILD_TYPE=Release
 )
@@ -29,6 +30,9 @@ UBUNTU_APT_PKGS=(
 gperf
 luajit
 luarocks
+autoconf
+libtool
+libtool-bin
 libuv1-dev
 libluajit-5.1-dev
 libunibilium-dev
@@ -37,6 +41,8 @@ libtermkey-dev
 libvterm-dev
 libutf8proc-dev
 lua-luv-dev
+lua-lpeg-dev
+lua-mpack
 )
 
 do_git_clone() {
