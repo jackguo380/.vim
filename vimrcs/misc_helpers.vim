@@ -1,6 +1,24 @@
 " Some random useful things
 
-if executable('ag')
+if executable('rg')
+    let s:rggrep = 'rg --vimgrep --no-ignore-messages --hidden'
+    let s:rggrep .= ' --color never --no-column'
+    let s:rggrep .= ' --iglob "!.git"'
+    let s:rggrep .= ' --iglob "!.hg"'
+    let s:rggrep .= ' --iglob "!.cquery_cache"'
+    let s:rggrep .= ' --iglob "!.ccls_cache"'
+    let s:rggrep .= ' --iglob "!.clangd"'
+    let s:rggrep .= ' --iglob "!.jdtls_data"'
+    let s:rggrep .= ' --iglob "!.metadata"'
+    let s:rggrep .= ' --iglob "!*.pyc"'
+    let s:rggrep .= ' --iglob "!*.o"'
+    let s:rggrep .= ' --iglob "!*.d"'
+    let s:rggrep .= ' --iglob "!*.gcda"'
+    let s:rggrep .= ' --iglob "!*.gcno"'
+    let s:rggrep .= ' --iglob "!*.out"'
+
+    let &grepprg = s:rggrep
+elseif executable('ag')
     let s:aggrep = 'ag --nogroup --hidden --nocolor'
     let s:aggrep .= ' --ignore .git'
     let s:aggrep .= ' --ignore .hg'

@@ -192,10 +192,35 @@ if $rustok; then
         fi
     done
 
+    export RUSTFLAGS="-C target-cpu=native"
+
     # Install fd
-    if ! ( cargo install --list | grep fd-find ); then
-        cargo install fd-find
+    if [ ! -d fd ]; then
+        git clone https://github.com/sharkdp/fd
     fi
+
+    cd fd
+
+    git pull
+
+    cargo build --release
+
+    cargo install --force --path .
+
+    # Ripgrep
+    if [ ! -d ripgrep ]; then
+        git clone https://github.com/BurntSushi/ripgrep
+    fi
+
+    cd ripgrep
+
+    git pull
+
+    rustup override set nightly
+
+    cargo build --release --features simd-accel
+
+    cargo install --force --path .
 
     # Install the rust analyzer lsp server
     if [ ! -d rust-analyzer ]; then
@@ -208,67 +233,6 @@ if $rustok; then
 
     cargo xtask install --server
 fi
-
-# YouCompleteMe (Deprecated)
-#cd "$ROOT_DIR"
-#if [ -d ./bundle/YouCompleteMe ]; then
-#    cd ./bundle/YouCompleteMe
-#
-#    install_py_flags=(
-#    --clangd-completer
-#    --skip-build # Don't build ycm_core, do this manually via CMake
-#    --no-regex   # Same with regex
-#    )
-#
-#    if $rustok; then
-#        install_py_flags+=( --rust-completer )
-#    fi
-#
-#    if ! ./install.py "${install_py_flags[@]}"; then
-#        echo "Failed to run install.py"
-#        exit 1
-#    fi
-#
-#    rm -rf build
-#    mkdir build
-#    cd build
-#
-#    if [ $PACKAGE_MANAGER = pamac ]; then
-#        cmake -DCMAKE_BUILD_TYPE=Release \
-#            -DPATH_TO_LLVM_ROOT=/usr \
-#            "$ROOT_DIR"/bundle/YouCompleteMe/third_party/ycmd/cpp "${ccache_args[@]}" -DUSE_PYTHON2=OFF &&
-#            make -j$(nproc) ycm_core
-#    else
-#        cmake -DCMAKE_BUILD_TYPE=Release -DPATH_TO_LLVM_ROOT="$llvm_dir" \
-#            -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" -DCMAKE_BUILD_RPATH="$llvm_dir/lib" . \
-#            -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,$llvm_dir/lib" \
-#            "$ROOT_DIR"/bundle/YouCompleteMe/third_party/ycmd/cpp "${ccache_args[@]}" -DUSE_PYTHON2=OFF &&
-#            make -j$(nproc) ycm_core
-#    fi
-#
-#    if [ $? -ne 0 ]; then
-#        echo "Failed to build ycmd"
-#        exit 1
-#
-#    fi
-#
-#    cd ..
-#    rm -rf build_regex
-#    mkdir build_regex
-#    cd build_regex
-#
-#    cmake . "$ROOT_DIR"/bundle/YouCompleteMe/third_party/ycmd/third_party/cregex \
-#        -DCMAKE_BUILD_TYPE=Release "${ccache_args[@]}" &&
-#        make -j$(nproc) _regex
-#    if [ $? -ne 0 ]; then
-#        echo "Failed to build cregex for ycm"
-#        exit 1
-#    fi
-#
-#    # Delete ycm's copy of libclang and force it to use the one we compiled cquery with
-#    cd "$ROOT_DIR"
-#    rm -f bundle/YouCompleteMe/third_party/ycmd/libclang.so*
-#fi
 
 echo "Everything was completed successfully!"
 exit 0

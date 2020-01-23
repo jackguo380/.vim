@@ -71,6 +71,9 @@ Plug 'vim-scripts/indentpython.vim'
 " SystemVerilog Syntax and Coloring
 Plug 'nachumk/systemverilog.vim'
 
+" CMake Syntax and Indent
+Plug 'Kitware/CMake', { 'rtp': 'Auxiliary/vim' }
+
 " Verilog compilation
 Plug 'vhda/verilog_systemverilog.vim', {
 	    \ 'for': ['systemverilog']
@@ -115,12 +118,6 @@ Plug 'brgmnn/vim-opencl'
 Plug 'jamessan/vim-gnupg'
 
 call plug#end()
-
-" CMake syntax
-CurlPlug "syntax/cmake.vim" 'https://raw.githubusercontent.com/Kitware/CMake/master/Auxiliary/vim/syntax/cmake.vim'
-
-" CMake indent
-CurlPlug 'indent/cmake.vim' 'https://raw.githubusercontent.com/Kitware/CMake/master/Auxiliary/vim/indent/cmake.vim'
 
 " Enable termdebug
 packadd termdebug
