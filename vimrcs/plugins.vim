@@ -30,6 +30,7 @@ Plug 'tpope/vim-sensible'
 Plug 'lifepillar/vim-mucomplete'
 
 " Language server support
+"Plug '~/Documents/Github/LanguageClient-neovim'
 Plug 'autozimu/LanguageClient-neovim', {
 	    \ 'branch': 'next',
 	    \ 'do': 'bash install.sh'
@@ -56,9 +57,9 @@ Plug 'scrooloose/nerdtree'
 Plug 'vim-airline/vim-airline'
 
 " Git Integration
-if isdirectory(g:my_project_root . '/.git')
+"if isdirectory(g:my_project_root . '/.git')
     Plug 'tpope/vim-fugitive'
-endif
+"endif
 
 " Mercurial Integration
 if isdirectory(g:my_project_root . '/.hg')
@@ -116,6 +117,9 @@ Plug 'brgmnn/vim-opencl'
 
 " Edit gpg encrypted files
 Plug 'jamessan/vim-gnupg'
+
+" Run commands automatically
+Plug 'skywind3000/asyncrun.vim'
 
 call plug#end()
 

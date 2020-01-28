@@ -36,8 +36,6 @@ let g:LanguageClient_waitOutputTimeout = 30
 
 let g:LanguageClient_diagnosticsEnable = 1
 
-autocmd FileType c,cpp let g:LanguageClient_diagnosticsEnable = 0
-
 if executable('pyls')
     let g:LanguageClient_serverCommands['python'] = ['pyls']
 endif
@@ -161,4 +159,12 @@ if isdirectory(g:my_vim_directory . '/eclipse.jdt.ls/org.eclipse.jdt.ls.product/
                 \ ]
 
     let g:LanguageClient_rootMarkers['java'] = ['.eclipse.jdt.ls.root']
+endif
+
+if executable('javascript-typescript-stdio')
+    let g:LanguageClient_serverCommands['javascript'] = ['javascript-typescript-stdio']
+    let g:LanguageClient_serverCommands['typescript'] =  ['javascript-typescript-stdio']
+
+    let g:LanguageClient_rootMarkers['javascript'] = ['jsconfig.json']
+    let g:LanguageClient_rootMarkers['typescript'] = ['tsconfig.json']
 endif

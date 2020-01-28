@@ -20,6 +20,7 @@ runtime vimrcs/fzf.vim
 runtime vimrcs/language_servers.vim
 runtime vimrcs/misc_helpers.vim
 runtime vimrcs/nerdtree.vim
+runtime vimrcs/asyncrun.vim
 
 " TODO: remove commented out settings after testing sensible.vim
 "set autoindent
