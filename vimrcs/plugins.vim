@@ -115,11 +115,17 @@ Plug 'ARM9/arm-syntax-vim'
 " OpenCL syntax
 Plug 'brgmnn/vim-opencl'
 
+" OpenGL/GLSL syntax
+Plug 'tikhomirov/vim-glsl'
+
 " Edit gpg encrypted files
 Plug 'jamessan/vim-gnupg'
 
 " Run commands automatically
 Plug 'skywind3000/asyncrun.vim'
+
+" CMake complete
+Plug 'richq/vim-cmake-completion'
 
 call plug#end()
 

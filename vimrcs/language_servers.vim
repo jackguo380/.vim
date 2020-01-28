@@ -128,8 +128,10 @@ endif
 
 if executable('clangd')
     "let g:LanguageClient_serverStderr = '/tmp/clangd.stderr'
-    let g:LanguageClient_serverCommands['opencl'] = ['clangd', '--log=verbose']
+    let g:LanguageClient_serverCommands['opencl'] = ['clangd']
     let g:LanguageClient_rootMarkers['opencl'] = ['compile_commands.json', 'compile_flags.txt', '.clangd_root']
+    let g:LanguageClient_serverCommands['glsl'] = ['clangd']
+    let g:LanguageClient_rootMarkers['glsl'] = ['compile_commands.json', 'compile_flags.txt', '.clangd_root']
 
     "let g:LanguageClient_serverCommands['cpp'] = ['clangd', '--log=verbose']
     "let g:LanguageClient_semanticHighlightMaps['cpp'] = [
