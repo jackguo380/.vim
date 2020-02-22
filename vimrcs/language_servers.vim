@@ -138,7 +138,7 @@ if executable('clangd')
     "            \ {'Function': ['entity.name.function.cpp']},
     "            \ {'Function': ['entity.name.function.method.cpp']},
     "            \ {'CppNamespace': ['entity.name.namespace.cpp']},
-    "            \ {'CppEnumConstant': ['variable.other.enummember.cpp']},
+    "            \ {'EnumConstant': ['variable.other.enummember.cpp']},
     "            \ {'CppMemberVariable': ['variable.other.field.cpp']},
     "            \ {'Type': ['entity.name.type.class.cpp']},
     "            \ {'Type': ['entity.name.type.enum.cpp']},
@@ -151,14 +151,16 @@ if isdirectory(g:my_vim_directory . '/eclipse.jdt.ls/org.eclipse.jdt.ls.product/
 
     let g:LanguageClient_serverCommands['java'] = s:jdtls_exec
 
-    let g:LanguageClient_semanticHighlightMaps['java'] = [
-                \ {"JavaStaticMemberFunction": ['storage.modifier.static.java', 'entity.name.function.java', '**']},
-                \ {"JavaMemberVariable": ['meta.definition.variable.java', 'meta.class.body.java', 'meta.class.java', '**']},
-                \ {"Function": ['entity.name.function.java', '**']},
-                \ {"Function": ['*', 'entity.name.function.java', '**']},
-                \ {"Type": ['entity.name.type.class.java', '**']},
-                \ {"Type": ['*', 'entity.name.type.class.java', '**']},
-                \ ]
+    let g:LanguageClient_semanticHighlightMaps['java'] = {
+                \ '^storage.modifier.static.java:entity.name.function.java': 'JavaStaticMemberFunction',
+                \ '^meta.definition.variable.java:meta.class.body.java:meta.class.java': 'JavaMemberVariable',
+                \ '^storage.modifier.static.java:storage.modifier.final.java:variable.other.definition.java:meta.definition.variable.java': 'EnumConstant',
+                \ '^entity.name.function.java': 'Function',
+                \ 'entity.name.function.java': 'Function',
+                \ 'entity.name.type.class.java': 'Type',
+                \ 'entity.name.type.enum.java': 'Type',
+                \ }
+
 
     let g:LanguageClient_rootMarkers['java'] = ['.eclipse.jdt.ls.root']
 endif
