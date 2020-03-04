@@ -4,6 +4,7 @@ set -o pipefail
 
 # -- Git --
 REPO=https://github.com/neovim/neovim.git
+REVISION=${1:-stable}
 
 # Install to a system directory rather than ~/.local so theres no broken
 # vim installations left over when moving distros while keeping /home
@@ -57,7 +58,7 @@ do_git_clone() {
 do_git_checkout() {
     # Ensure all recent versions are here
     git fetch origin tag stable
-    git checkout stable
+    git checkout "${REVISION}"
 }
 
 do_apt_packages() {

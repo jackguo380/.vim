@@ -127,6 +127,9 @@ Plug 'skywind3000/asyncrun.vim'
 " CMake complete
 Plug 'richq/vim-cmake-completion'
 
+" Autorun shellcheck
+Plug 'itspriddle/vim-shellcheck'
+
 call plug#end()
 
 " Enable termdebug

@@ -137,7 +137,7 @@ fi
 
 cd ccls
 
-if ! git pull && git submodule update --init; then
+if ! git pull origin master && git submodule update --init; then
     echo "failed to update ccls"
     exit 1
 fi

@@ -159,6 +159,8 @@ if isdirectory(g:my_vim_directory . '/eclipse.jdt.ls/org.eclipse.jdt.ls.product/
                 \ 'entity.name.function.java': 'Function',
                 \ 'entity.name.type.class.java': 'Type',
                 \ 'entity.name.type.enum.java': 'Type',
+                \ 'entity.name.type.interface.java': 'Type',
+                \ '^storage.type.generic.java': 'Type',
                 \ }
 
 
