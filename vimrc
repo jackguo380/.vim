@@ -21,6 +21,7 @@ runtime vimrcs/language_servers.vim
 runtime vimrcs/misc_helpers.vim
 runtime vimrcs/nerdtree.vim
 runtime vimrcs/asyncrun.vim
+runtime vimrcs/markdownpreview.vim
 
 " TODO: remove commented out settings after testing sensible.vim
 "set autoindent

@@ -24,6 +24,7 @@ let g:LanguageClient_semanticHighlightMaps = {}
 
 " Debug Logging
 let g:lsp_cxx_hl_log_file = '/tmp/lsp-cxx-hl.log'
+"let g:lsp_cxx_hl_verbose_log = 1
 
 let g:lsp_cxx_hl_use_text_props = 1
 
@@ -128,22 +129,19 @@ endif
 
 if executable('clangd')
     "let g:LanguageClient_serverStderr = '/tmp/clangd.stderr'
-    let g:LanguageClient_serverCommands['opencl'] = ['clangd']
+    "let g:LanguageClient_serverCommands['opencl'] = ['clangd']
     let g:LanguageClient_rootMarkers['opencl'] = ['compile_commands.json', 'compile_flags.txt', '.clangd_root']
-    let g:LanguageClient_serverCommands['glsl'] = ['clangd']
+    "let g:LanguageClient_serverCommands['glsl'] = ['clangd']
     let g:LanguageClient_rootMarkers['glsl'] = ['compile_commands.json', 'compile_flags.txt', '.clangd_root']
 
     "let g:LanguageClient_serverCommands['cpp'] = ['clangd', '--log=verbose']
-    "let g:LanguageClient_semanticHighlightMaps['cpp'] = [
-    "            \ {'Function': ['entity.name.function.cpp']},
-    "            \ {'Function': ['entity.name.function.method.cpp']},
-    "            \ {'CppNamespace': ['entity.name.namespace.cpp']},
-    "            \ {'EnumConstant': ['variable.other.enummember.cpp']},
-    "            \ {'CppMemberVariable': ['variable.other.field.cpp']},
-    "            \ {'Type': ['entity.name.type.class.cpp']},
-    "            \ {'Type': ['entity.name.type.enum.cpp']},
-    "            \ {'Type': ['entity.name.type.template.cpp']},
-    "            \ ]
+    let g:LanguageClient_semanticHighlightMaps['cpp'] = {
+                \ 'entity.name.namespace.cpp': 'CppNameSpace',
+                \ 'variable.other.field.cpp': 'CppMemberVariable',
+                \ 'variable.other.enummember.cpp': 'EnumConstant',
+                \ 'entity.name.function..*.cpp': 'Function',
+                \ 'entity.name.type..*.cpp': 'Type',
+                \ }
 endif
 
 if isdirectory(g:my_vim_directory . '/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target')
