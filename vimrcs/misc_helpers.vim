@@ -1,6 +1,6 @@
 " Some random useful things
 
-if executable('rg')
+if 0 " executable('rg')
     let s:rggrep = 'rg --vimgrep --no-ignore-messages --hidden'
     let s:rggrep .= ' --color never --no-column'
     let s:rggrep .= ' --iglob "!.git"'
