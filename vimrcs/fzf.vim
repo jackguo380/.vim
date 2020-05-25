@@ -1,8 +1,5 @@
 " FZF
 
-" Use existing buffer 
-command! -nargs=1 FzfOpenFile execute 'buffer' . bufnr(<f-args>, 1)
-
 if executable('fd')
     let s:fzf_user_command = 'fd --search-path . --color never --hidden'
     let s:fzf_user_command .= ' -E .git'
@@ -36,6 +33,19 @@ elseif executable('ag')
 else
     echoerr "FZF has no compatible program!"
 endif
+
+function! s:fzf_open_file(file)
+    let l:n = bufnr(a:file)
+    if l:n != -1
+        execute 'buffer ' . l:n
+    else
+        execute 'edit ' . a:file
+    endif
+endfunction
+
+" Use existing buffer 
+"command! -nargs=1 FzfOpenFile execute 'buffer' . bufnr(<f-args>, 1)
+command! -nargs=1 FzfOpenFile call s:fzf_open_file(<f-args>)
 
 let g:fzf_custom_opts = {
             \ 'sink': 'FzfOpenFile',
