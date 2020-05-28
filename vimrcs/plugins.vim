@@ -60,14 +60,10 @@ Plug 'scrooloose/nerdtree'
 Plug 'vim-airline/vim-airline'
 
 " Git Integration
-"if isdirectory(g:my_project_root . '/.git')
-    Plug 'tpope/vim-fugitive'
-"endif
+Plug 'tpope/vim-fugitive'
 
 " Mercurial Integration
-if isdirectory(g:my_project_root . '/.hg')
-    Plug 'jlfwong/vim-mercenary'
-endif
+Plug 'ludovicchabant/vim-lawrencium'
 
 " Python indentation
 Plug 'vim-scripts/indentpython.vim'
