@@ -26,6 +26,9 @@ Plug 'tpope/vim-sleuth'
 " Various useful configurations
 Plug 'tpope/vim-sensible'
 
+" Surround text objects
+Plug 'tpope/vim-surround'
+
 " Completion
 Plug 'lifepillar/vim-mucomplete'
 
