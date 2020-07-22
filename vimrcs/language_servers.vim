@@ -1,18 +1,18 @@
 " Language Server Configuration
 
 " LanguageClient
-nmap <leader>gg :call LanguageClient#textDocument_definition()<CR>
-nmap <leader>gs :call LanguageClient#textDocument_references()<CR>
-nmap <leader>gi :call LanguageClient#textDocument_implementation()<CR>
-nmap <leader>gt :call LanguageClient#textDocument_typeDefinition()<CR>
-nmap <leader>gh :call LanguageClient#textDocument_hover()<CR>
+nmap csfg :call LanguageClient#textDocument_definition()<CR>
+nmap csfs :call LanguageClient#textDocument_references()<CR>
+nmap csfi :call LanguageClient#textDocument_implementation()<CR>
+nmap csft :call LanguageClient#textDocument_typeDefinition()<CR>
+nmap csfh :call LanguageClient#textDocument_hover()<CR>
 
 " ccls specific
-nmap <leader>gc :call LanguageClient#findLocations({'method':'$ccls/call'})<CR>
-nmap <leader>gv :call LanguageClient#findLocations({'method':'$ccls/vars'})<CR>
-nmap <leader>gd :call LanguageClient#findLocations({'method':'$ccls/inheritance', 'derived': v:true})<CR>
-nmap <leader>gb :call LanguageClient#findLocations({'method':'$ccls/inheritance'})<CR>
-nmap <leader>gp :call LanguageClient#findLocations({'method':'$ccls/navigate', 'direction': 'U'})<CR>
+nmap csfc :call LanguageClient#findLocations({'method':'$ccls/call'})<CR>
+nmap csfv :call LanguageClient#findLocations({'method':'$ccls/vars'})<CR>
+nmap csfd :call LanguageClient#findLocations({'method':'$ccls/inheritance', 'derived': v:true})<CR>
+nmap csfb :call LanguageClient#findLocations({'method':'$ccls/inheritance'})<CR>
+nmap csfp :call LanguageClient#findLocations({'method':'$ccls/navigate', 'direction': 'U'})<CR>
 
 let g:LanguageClient_diagnosticsList = 'Location'
 let g:LanguageClient_selectionUI = 'quickfix'
