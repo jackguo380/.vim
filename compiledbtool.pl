@@ -460,8 +460,10 @@ None
 
     for my $command (@$cdb) {
         if(not defined $command->{"arguments"}) {
-            print STDERR "Missing arguments key\n";
-            die "Cannot support older command schema";
+            my $commandstr = $command->{"command"};
+            my @commandarr = split(/[ \t]+/, $commandstr);
+            $command->{"arguments"} = \@commandarr;
+            delete $command->{"command"};
         }
 
         my $arguments = $command->{"arguments"};
