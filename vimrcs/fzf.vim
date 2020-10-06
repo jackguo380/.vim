@@ -11,9 +11,6 @@ if executable('fd')
     let s:fzf_user_command .= ' -E .metadata'
     let s:fzf_user_command .= ' -E "*.pyc"'
     let s:fzf_user_command .= ' -E "*.o"'
-    let s:fzf_user_command .= ' -E "*.d"'
-    let s:fzf_user_command .= ' -E "*.gcda"'
-    let s:fzf_user_command .= ' -E "*.gcno"'
     let s:fzf_user_command .= ' -E "*.out"'
 elseif executable('ag')
     let s:fzf_user_command = 'ag . -i --nocolor --nogroup --hidden -g ""'
@@ -26,9 +23,6 @@ elseif executable('ag')
     let s:fzf_user_command .= ' --ignore .metadata'
     let s:fzf_user_command .= ' --ignore "*.pyc"'
     let s:fzf_user_command .= ' --ignore "*.o"'
-    let s:fzf_user_command .= ' --ignore "*.d"'
-    let s:fzf_user_command .= ' --ignore "*.gcda"'
-    let s:fzf_user_command .= ' --ignore "*.gcno"'
     let s:fzf_user_command .= ' --ignore "*.out"'
 else
     echoerr "FZF has no compatible program!"

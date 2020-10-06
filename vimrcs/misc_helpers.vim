@@ -12,9 +12,6 @@ if 0 " executable('rg')
     let s:rggrep .= ' --iglob "!.metadata"'
     let s:rggrep .= ' --iglob "!*.pyc"'
     let s:rggrep .= ' --iglob "!*.o"'
-    let s:rggrep .= ' --iglob "!*.d"'
-    let s:rggrep .= ' --iglob "!*.gcda"'
-    let s:rggrep .= ' --iglob "!*.gcno"'
     let s:rggrep .= ' --iglob "!*.out"'
 
     let &grepprg = s:rggrep
@@ -29,9 +26,6 @@ elseif executable('ag')
     let s:aggrep .= ' --ignore .metadata'
     let s:aggrep .= ' --ignore "*.pyc"'
     let s:aggrep .= ' --ignore "*.o"'
-    let s:aggrep .= ' --ignore "*.d"'
-    let s:aggrep .= ' --ignore "*.gcda"'
-    let s:aggrep .= ' --ignore "*.gcno"'
     let s:aggrep .= ' --ignore "*.out"'
 
     let &grepprg = s:aggrep
