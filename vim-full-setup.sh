@@ -3,12 +3,12 @@
 set -e
 set -o pipefail
 
-if ! which git; then
+if ! command -v git; then
     echo "Please install git"
     exit 1
 fi
 
-if ! which curl; then
+if ! command -v curl; then
     echo "Please install curl"
     exit 1
 fi
@@ -41,8 +41,9 @@ while getopts "l:c:h" opt; do
 done
 
 # Downloaded LLVM
-LLVM_VER=clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04
-LLVM_URL=http://releases.llvm.org/9.0.0/$LLVM_VER.tar.xz
+LLVM_MAJOR_VER=10
+LLVM_VER=clang+llvm-$LLVM_MAJOR_VER.0.0-x86_64-linux-gnu-ubuntu-18.04
+LLVM_URL=http://releases.llvm.org/$LLVM_MAJOR_VER.0.0/$LLVM_VER.tar.xz
 
 function download_llvm {
     pushd "$ROOT_DIR"
@@ -83,12 +84,12 @@ cd "$ROOT_DIR"
 # Run vundle to configure all plugins, ignore the errors from this
 vim +PlugUpdate +qall
 
-if ! which cmake; then
+if ! command -v cmake; then
     echo "Please install cmake"
     exit 1
 fi
 
-if which ccache; then
+if command -v ccache; then
     ccache_args=(
         -DCMAKE_C_COMPILER_LAUNCHER=ccache
         -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
@@ -116,11 +117,17 @@ if [ $PACKAGE_MANAGER = "pamac" ]; then
         sudo pamac install clang
     fi
 else
-    if ! dpkg -l llvm-9 llvm-9-dev clang-9 libclang-9-dev > /dev/null; then
-        sudo apt install llvm-9 llvm-9-dev clang-9 libclang-9-dev
+    llvm_packages=(
+        llvm-$LLVM_MAJOR_VER
+        llvm-$LLVM_MAJOR_VER-dev
+        clang-$LLVM_MAJOR_VER
+        libclang-$LLVM_MAJOR_VER-dev 
+    )
+    if ! dpkg -l "${llvm_packages[@]}" > /dev/null; then
+        sudo apt install "${llvm_packages[@]}"
     fi
     #download_llvm
-    if ! llvm_dir=$(llvm-config-9 --prefix); then
+    if ! llvm_dir=$(llvm-config-$LLVM_MAJOR_VER --prefix); then
         echo "llvm-config not found!"
         exit 1
     fi
@@ -148,7 +155,7 @@ cd build
 
 cmake .. -DCMAKE_PREFIX_PATH="$llvm_dir" -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" \
     -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release "${ccache_args[@]}" &&
-    make -j$(nproc) && make install
+    cmake --build . -- -j$(nproc) && cmake --install .
 
 if [ $? -ne 0 ]; then
     echo "Failed to build ccls"
@@ -202,6 +209,8 @@ if $rustok; then
     cd fd
 
     git pull
+
+    rustup override set nightly
 
     cargo build --release
 
