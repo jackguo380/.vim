@@ -4,7 +4,6 @@ set -o pipefail
 
 # -- Git --
 REPO=https://github.com/neovim/neovim.git
-REVISION=${1:-stable}
 
 # Install to a system directory rather than ~/.local so theres no broken
 # vim installations left over when moving distros while keeping /home
@@ -56,9 +55,8 @@ do_git_clone() {
 }
 
 do_git_checkout() {
-    # Ensure all recent versions are here
-    git fetch origin tag stable
-    git checkout "${REVISION}"
+    git checkout master
+    git pull origin master
 }
 
 do_apt_packages() {
@@ -94,6 +92,11 @@ do_install() {
     # Create some symlinks to .local
     rm -f "$HOME/.local/bin/nvim"
     ln -s "$INSTALL_PREFIX/bin/nvim" "$HOME/.local/bin/nvim"
+}
+
+do_clean() {
+    echo "Cleaning..."
+    cmake --build build --target clean || true
 }
 
 yn_prompt() {
@@ -135,3 +138,5 @@ do_compile
 if yn_prompt "Install [y/n]?"; then
     do_install
 fi
+
+do_clean

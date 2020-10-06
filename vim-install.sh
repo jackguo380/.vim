@@ -48,6 +48,8 @@ UBUNTU_APT_PKGS=(
 libperl-dev
 #libpython-dev
 libpython3-dev
+python3-dev
+python3-distutils
 libx11-dev libxpm-dev libxt-dev
 libtinfo-dev
 )
@@ -86,6 +88,11 @@ do_install() {
     ln -s "$INSTALL_PREFIX/bin/vim" "$HOME/.local/bin/vim"
     rm -f "$HOME/.local/bin/vimdiff"
     ln -s "$INSTALL_PREFIX/bin/vimdiff" "$HOME/.local/bin/vimdiff"
+}
+
+do_clean() {
+    echo "Cleaning..."
+    make clean distclean || true
 }
 
 yn_prompt() {
@@ -134,3 +141,5 @@ do_compile
 if yn_prompt "Install [y/n]?"; then
     do_install
 fi
+
+do_clean
