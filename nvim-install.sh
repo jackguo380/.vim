@@ -16,6 +16,8 @@ THIRDPARTY_CONFIG_OPTS=(
     -DUSE_BUNDLED_LUV=ON
     -DUSE_BUNDLED_LIBUV=ON
     -DUSE_BUNDLED_LIBVTERM=ON
+    -DUSE_BUNDLED_TS=ON
+    -DUSE_BUNDLED_TS_PARSERS=ON
     -DCMAKE_BUILD_TYPE=Release
 )
 
@@ -61,7 +63,6 @@ do_git_checkout() {
 
 do_apt_packages() {
     sudo apt install "${UBUNTU_APT_PKGS[@]}"
-
 }
 
 do_compile() {
