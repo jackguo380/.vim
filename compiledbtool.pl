@@ -503,6 +503,10 @@ sub cross_compile_flags {
 
         push @flags, "--gcc-toolchain=$toolchain";
 
+        my $sysroot = `$compiler -print-sysroot`;
+
+        push @flags, "--sysroot=$sysroot";
+
         my ($stdinc, $stdinc_cpp) = command_stdinc($command);
 
         if ($stdinc) {

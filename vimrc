@@ -66,5 +66,13 @@ nnoremap <leader>rh :reg 0 1 2 3 4 5 6 7 8 9<CR>
 " Paste in visual mode without yanking with P
 xnoremap <expr> P '"_d"'.v:register.'P'
 
+if has('nvim')
+    tnoremap <C-w>N <C-\><C-n>
+    tnoremap <C-w>h <C-\><C-n><C-w>h
+    tnoremap <C-w>j <C-\><C-n><C-w>j
+    tnoremap <C-w>k <C-\><C-n><C-w>k
+    tnoremap <C-w>l <C-\><C-n><C-w>l
+endif
+
 runtime vimrcs/colorscheme.vim
 

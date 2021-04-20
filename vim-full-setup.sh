@@ -74,6 +74,8 @@ elif [ "$DISTRIB_ID" = Ubuntu ]; then
     PACKAGE_MANAGER=apt-get
 elif [ "$DISTRIB_ID" = ManjaroLinux ]; then
     PACKAGE_MANAGER=pamac
+elif [ "$DISTRIB_ID" = Arch ]; then
+    PACKAGE_MANAGER=pacman
 else
     echo "Unsupported distro $DISTRIB_ID"
     exit 1
@@ -104,6 +106,8 @@ if [ "$yn" = y ]; then
         sudo apt-get install libncurses[0-9]-dev zlib1g-dev zlib1g
     elif [ $PACKAGE_MANAGER = "pamac" ]; then
         sudo pamac install zlib ncurses
+    elif [ $PACKAGE_MANAGER = "pacman" ]; then
+        sudo pacman -S zlib ncurses
     fi
 fi
 
@@ -115,6 +119,14 @@ if [ $PACKAGE_MANAGER = "pamac" ]; then
 
     if ! ( pamac list | grep clang ); then
         sudo pamac install clang
+    fi
+elif [ $PACKAGE_MANAGER = "pacman" ]; then
+    if ! pacman -Q llvm; then
+        sudo pacman -S llvm
+    fi
+
+    if ! pacman -Q clang; then
+        sudo pacman -S clang
     fi
 else
     llvm_packages=(
@@ -162,6 +174,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+cmake --build . --target clean || true
+
 cd "$ROOT_DIR"
 
 # Rust
@@ -201,6 +215,8 @@ if $rustok; then
 
     export RUSTFLAGS="-C target-cpu=native"
 
+    cd "$ROOT_DIR"
+
     # Install fd
     if [ ! -d fd ]; then
         git clone https://github.com/sharkdp/fd
@@ -215,6 +231,10 @@ if $rustok; then
     cargo build --release
 
     cargo install --force --path .
+
+    cargo clean
+
+    cd "$ROOT_DIR"
 
     # Ripgrep
     if [ ! -d ripgrep ]; then
@@ -231,6 +251,10 @@ if $rustok; then
 
     cargo install --force --path .
 
+    cargo clean
+
+    cd "$ROOT_DIR"
+
     # Install the rust analyzer lsp server
     if [ ! -d rust-analyzer ]; then
         git clone https://github.com/rust-analyzer/rust-analyzer
@@ -240,7 +264,11 @@ if $rustok; then
 
     git pull
 
+    rustup override set nightly
+
     cargo xtask install --server
+
+    cargo clean
 fi
 
 echo "Everything was completed successfully!"

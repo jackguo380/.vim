@@ -32,6 +32,7 @@ function! s:fzf_open_file(file)
     let l:n = bufnr(a:file)
     if l:n != -1
         execute 'buffer ' . l:n
+        set buflisted
     else
         execute 'edit ' . a:file
     endif
