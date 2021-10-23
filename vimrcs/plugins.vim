@@ -135,5 +135,5 @@ call plug#end()
 packadd termdebug
 
 au FileType rust let g:termdebugger = 'rust-gdb'
-au FileType c,cpp let g:termdebugger = 'gdb'
+au FileType c,cpp let g:termdebugger = './gdb'
 

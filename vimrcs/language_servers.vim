@@ -37,7 +37,11 @@ let g:LanguageClient_waitOutputTimeout = 30
 let g:LanguageClient_diagnosticsEnable = 1
 
 if executable('pyls')
-    let g:LanguageClient_serverCommands['python'] = ['pyls']
+    let g:LanguageClient_serverCommands['python'] = {
+                \ 'name': 'python3',
+                \ 'command': ['pyls'],
+                \ 'initializationOptions': {}
+            \ }
 endif
 
 " Rust language server
@@ -117,6 +121,8 @@ elseif executable(s:ccls_lang_server_executable[0])
     let s:ccls_settings = {
                 \ 'cache': { 'directory': s:ccls_root_dir . '/.ccls_cache' },
                 \ 'highlight': { 'lsRanges' : v:true },
+                \ 'diagnostics': { 'onChange' : -1 },
+                \ 'completion': { 'maxNum' : 40 },
                 \ }
 
     let s:ccls_exec = s:ccls_lang_server_executable + ['-init=' . json_encode(s:ccls_settings)]
@@ -133,13 +139,14 @@ if executable('clangd')
     "let g:LanguageClient_serverCommands['glsl'] = ['clangd']
     let g:LanguageClient_rootMarkers['glsl'] = ['compile_commands.json', 'compile_flags.txt', '.clangd_root']
 
-    "let g:LanguageClient_serverCommands['cpp'] = ['clangd', '--log=verbose']
+    "let g:LanguageClient_serverCommands['cpp'] = ['clangd']
     let g:LanguageClient_semanticHighlightMaps['cpp'] = {
                 \ 'entity.name.namespace.cpp': 'CppNameSpace',
                 \ 'variable.other.field.cpp': 'CppMemberVariable',
                 \ 'variable.other.enummember.cpp': 'EnumConstant',
                 \ 'entity.name.function..*.cpp': 'Function',
                 \ 'entity.name.type..*.cpp': 'Type',
+                \ 'meta.disabled': 'Comment',
                 \ }
 endif
 

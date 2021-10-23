@@ -41,7 +41,7 @@ while getopts "l:c:h" opt; do
 done
 
 # Downloaded LLVM
-LLVM_MAJOR_VER=10
+LLVM_MAJOR_VER=14
 LLVM_VER=clang+llvm-$LLVM_MAJOR_VER.0.0-x86_64-linux-gnu-ubuntu-18.04
 LLVM_URL=http://releases.llvm.org/$LLVM_MAJOR_VER.0.0/$LLVM_VER.tar.xz
 
@@ -179,6 +179,10 @@ cmake --build . --target clean || true
 cd "$ROOT_DIR"
 
 # Rust
+read -p "Build Rust Deps [y/n]?" yn
+if [ "$yn" != y ]; then
+    exit 0
+fi
 
 # Detect per user cargo installations
 if [ -d "$HOME/.cargo/bin" ]; then
@@ -247,7 +251,7 @@ if $rustok; then
 
     rustup override set nightly
 
-    cargo build --release --features simd-accel
+    RUSTFLAGS="-C target-cpu=native" cargo build --release --features 'simd-accel'
 
     cargo install --force --path .
 
