@@ -30,3 +30,5 @@ coc-settings.json
 rust-analyzer/
 eclipse.jdt.ls
 neovim
+llvm_build
+llvm_install

@@ -100,7 +100,7 @@ else
     ccache_args=()
 fi
 
-read -p "Install libncurses zlib via $PACKAGE_MANAGER [y/n]?" yn
+read -r -p "Install libncurses zlib via $PACKAGE_MANAGER [y/n]?" yn
 if [ "$yn" = y ]; then
     if [ $PACKAGE_MANAGER = "apt-get" ]; then
         sudo apt-get install libncurses[0-9]-dev zlib1g-dev zlib1g
@@ -130,10 +130,10 @@ elif [ $PACKAGE_MANAGER = "pacman" ]; then
     fi
 else
     llvm_packages=(
-        llvm-$LLVM_MAJOR_VER
-        llvm-$LLVM_MAJOR_VER-dev
-        clang-$LLVM_MAJOR_VER
-        libclang-$LLVM_MAJOR_VER-dev 
+        "llvm-$LLVM_MAJOR_VER"
+        "llvm-$LLVM_MAJOR_VER-dev"
+        "clang-$LLVM_MAJOR_VER"
+        "libclang-$LLVM_MAJOR_VER-dev"
     )
     if ! dpkg -l "${llvm_packages[@]}" > /dev/null; then
         sudo apt install "${llvm_packages[@]}"
@@ -165,21 +165,22 @@ rm -rf build
 mkdir build
 cd build
 
+if [ -f "$HOME/.vim/llvm_install/bin/llvm-config" ]; then
+    echo "Using custom built llvm in ~/.vim/llvm_install"
+    echo "Version: $("$HOME/.vim/llvm_install/bin/llvm-config" --version)"
+    llvm_dir="$HOME/.vim/llvm_install"
+fi
+
 cmake .. -DCMAKE_PREFIX_PATH="$llvm_dir" -DCMAKE_INSTALL_RPATH="$llvm_dir/lib" \
     -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release "${ccache_args[@]}" &&
-    cmake --build . -- -j$(nproc) && cmake --install .
-
-if [ $? -ne 0 ]; then
-    echo "Failed to build ccls"
-    exit 1
-fi
+    cmake --build . -- -j"$(nproc)" && cmake --install .
 
 cmake --build . --target clean || true
 
 cd "$ROOT_DIR"
 
 # Rust
-read -p "Build Rust Deps [y/n]?" yn
+read -r -p "Build Rust Deps [y/n]?" yn
 if [ "$yn" != y ]; then
     exit 0
 fi
@@ -221,58 +222,54 @@ if $rustok; then
 
     cd "$ROOT_DIR"
 
-    # Install fd
+    # FD
     if [ ! -d fd ]; then
         git clone https://github.com/sharkdp/fd
     fi
-
-    cd fd
-
-    git pull
-
-    rustup override set nightly
-
-    cargo build --release
-
-    cargo install --force --path .
-
-    cargo clean
-
-    cd "$ROOT_DIR"
 
     # Ripgrep
     if [ ! -d ripgrep ]; then
         git clone https://github.com/BurntSushi/ripgrep
     fi
 
-    cd ripgrep
-
-    git pull
-
-    rustup override set nightly
-
-    RUSTFLAGS="-C target-cpu=native" cargo build --release --features 'simd-accel'
-
-    cargo install --force --path .
-
-    cargo clean
-
-    cd "$ROOT_DIR"
-
     # Install the rust analyzer lsp server
     if [ ! -d rust-analyzer ]; then
         git clone https://github.com/rust-analyzer/rust-analyzer
     fi
 
-    cd rust-analyzer
+    function do_rust_install {
+        project=$1
+        shift
 
-    git pull
+        cd "$project"
 
-    rustup override set nightly
+        git pull
 
-    cargo xtask install --server
+        rustup override set nightly
 
-    cargo clean
+        if [ $# -eq 0 ]; then
+            cargo build --release
+
+            cargo install --force --path .
+        else
+            cargo "$@"
+        fi
+
+        cargo clean
+
+        cd "$ROOT_DIR"
+    }
+
+    do_rust_install fd &
+    fd_pid=$!
+
+    do_rust_install ripgrep &
+    ripgrep_pid=$!
+
+    do_rust_install rust-analyzer xtask install --server &
+    ra_pid=$!
+
+    wait $fd_pid $ripgrep_pid $ra_pid
 fi
 
 echo "Everything was completed successfully!"
