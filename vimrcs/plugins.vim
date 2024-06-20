@@ -62,31 +62,15 @@ Plug 'vim-airline/vim-airline'
 " Git Integration
 Plug 'tpope/vim-fugitive'
 
-" Mercurial Integration
-Plug 'ludovicchabant/vim-lawrencium'
-
 " Python indentation
 Plug 'vim-scripts/indentpython.vim'
-
-" SystemVerilog Syntax and Coloring
-Plug 'nachumk/systemverilog.vim'
 
 " CMake Syntax and Indent
 Plug 'Kitware/CMake', { 'rtp': 'Auxiliary/vim' }
 
-" Verilog compilation
-Plug 'vhda/verilog_systemverilog.vim', {
-	    \ 'for': ['systemverilog']
-	    \ }
-
 " fzf integration with vim
 Plug '~/.fzf'
 Plug 'junegunn/fzf.vim'
-
-" Markdown Preview
-Plug 'iamcco/markdown-preview.vim', {
-	    \ 'for': ['markdown']
-	    \ }
 
 " CSV files
 Plug 'chrisbra/csv.vim', {
@@ -107,15 +91,6 @@ Plug 'Valloric/MatchTagAlways', {
 Plug 'lervag/vimtex', {
 	    \ 'for': ['tex']
 	    \ }
-
-" arm asm syntax
-Plug 'ARM9/arm-syntax-vim'
-
-" OpenCL syntax
-Plug 'brgmnn/vim-opencl'
-
-" OpenGL/GLSL syntax
-Plug 'tikhomirov/vim-glsl'
 
 " Edit gpg encrypted files
 Plug 'jamessan/vim-gnupg'

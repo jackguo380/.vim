@@ -39,10 +39,10 @@ let g:LanguageClient_waitOutputTimeout = 30
 
 let g:LanguageClient_diagnosticsEnable = 1
 
-if executable('pyls')
+if executable('pylsp')
     let g:LanguageClient_serverCommands['python'] = {
                 \ 'name': 'python3',
-                \ 'command': ['pyls'],
+                \ 'command': ['pylsp'],
                 \ 'initializationOptions': {}
             \ }
 endif
@@ -125,7 +125,7 @@ elseif executable(s:ccls_lang_server_executable[0])
                 \ 'cache': { 'directory': s:ccls_root_dir . '/.ccls_cache' },
                 \ 'highlight': { 'lsRanges' : v:true },
                 \ 'diagnostics': { 'onChange' : -1 },
-                \ 'completion': { 'maxNum' : 40 },
+                \ 'completion': { 'maxNum' : 60 },
                 \ }
 
     let s:ccls_exec = s:ccls_lang_server_executable + ['-init=' . json_encode(s:ccls_settings)]
@@ -153,8 +153,9 @@ if executable('clangd')
     "            \ }
 endif
 
-if isdirectory(g:my_vim_directory . '/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target')
-    let s:jdtls_exec = [g:my_vim_directory . '/jdtls', '-data', g:my_project_root . '/..']
+if isdirectory(g:my_vim_directory . '/jdt-language-server')
+    "let s:jdtls_exec = [g:my_vim_directory . '/jdtls', '-data', g:my_project_root]
+    let s:jdtls_exec = [g:my_vim_directory . '/jdt-language-server/bin/jdtls', '-data', g:my_project_root]
 
     let g:LanguageClient_serverCommands['java'] = s:jdtls_exec
 
