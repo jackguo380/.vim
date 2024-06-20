@@ -16,7 +16,7 @@ if 0 " executable('rg')
 
     let &grepprg = s:rggrep
 elseif executable('ag')
-    let s:aggrep = 'ag --nogroup --hidden --nocolor'
+    let s:aggrep = 'ag --vimgrep --nogroup --hidden --nocolor'
     let s:aggrep .= ' --ignore .git'
     let s:aggrep .= ' --ignore .hg'
     let s:aggrep .= ' --ignore .cquery_cache'
