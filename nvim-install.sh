@@ -12,7 +12,7 @@ INSTALL_PREFIX=/usr/local/guoj-nvim
 # -- Compilation --
 
 THIRDPARTY_CONFIG_OPTS=(
-    -DUSE_BUNDLED=OFF
+    -DUSE_BUNDLED=ON
     -DUSE_BUNDLED_LUV=ON
     -DUSE_BUNDLED_LIBUV=ON
     -DUSE_BUNDLED_LIBVTERM=ON
@@ -70,17 +70,17 @@ do_compile() {
     mkdir build
     pushd build
 
-    mkdir build-third-party
-    pushd build-third-party
+    mkdir build-deps
+    pushd build-deps
 
     # Build some third party libraries that are hard to install
-    cmake "${THIRDPARTY_CONFIG_OPTS[@]}" ../../third-party
+    cmake "${THIRDPARTY_CONFIG_OPTS[@]}" ../../cmake.deps
     cmake --build . -- -j$(nproc)
 
     popd
 
     # Build Neovim
-    DEPS_BUILD_DIR=$PWD/build-third-party cmake "${CONFIG_OPTS[@]}" ..
+    DEPS_BUILD_DIR=$PWD/build-deps cmake "${CONFIG_OPTS[@]}" ..
     cmake --build . -- -j$(nproc)
 
     popd
