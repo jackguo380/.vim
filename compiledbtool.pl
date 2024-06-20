@@ -121,8 +121,10 @@ None so far...
         my $curfile = $command->{"file"};
 
         if(not defined $command->{"arguments"}) {
-            print STDERR "Missing arguments key for $curfile\n";
-            die "Cannot support older command schema";
+            my $commandstr = $command->{"command"};
+            my @commandarr = split(/[ \t]+/, $commandstr);
+            $command->{"arguments"} = \@commandarr;
+            delete $command->{"command"};
         }
 
         print STDERR colored($curfile, "yellow"), ": Adding $flag\n";
@@ -157,8 +159,10 @@ None so far...
         my $curfile = $command->{"file"};
 
         if(not defined $command->{"arguments"}) {
-            print STDERR "Missing arguments key for $curfile\n";
-            die "Cannot support older command schema";
+            my $commandstr = $command->{"command"};
+            my @commandarr = split(/[ \t]+/, $commandstr);
+            $command->{"arguments"} = \@commandarr;
+            delete $command->{"command"};
         }
 
         my @remlist;
@@ -217,8 +221,10 @@ Options:
         my $curfile = $command->{"file"};
 
         if(not defined $command->{"arguments"}) {
-            print STDERR "Missing arguments key for $curfile\n";
-            die "Cannot support older command schema";
+            my $commandstr = $command->{"command"};
+            my @commandarr = split(/[ \t]+/, $commandstr);
+            $command->{"arguments"} = \@commandarr;
+            delete $command->{"command"};
         }
 
         for my $arg (@{$command->{"arguments"}}) {
@@ -260,8 +266,10 @@ Options:
         my $curdir = $command->{"directory"};
 
         if(not defined $command->{"arguments"}) {
-            print STDERR "Missing arguments key for $curfile\n";
-            die "Cannot support older command schema";
+            my $commandstr = $command->{"command"};
+            my @commandarr = split(/[ \t]+/, $commandstr);
+            $command->{"arguments"} = \@commandarr;
+            delete $command->{"command"};
         }
 
         if($useworkdir) {
@@ -370,8 +378,10 @@ None so far...
         my $flags = $command->{"arguments"};
 
         if(not defined $command->{"arguments"}) {
-            print STDERR "Missing arguments key\n";
-            die "Cannot support older command schema";
+            my $commandstr = $command->{"command"};
+            my @commandarr = split(/[ \t]+/, $commandstr);
+            $command->{"arguments"} = \@commandarr;
+            delete $command->{"command"};
         }
 
         for my $flag (@$flags) {
