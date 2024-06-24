@@ -14,10 +14,12 @@ filetype plugin indent on
 syntax on
 let mapleader = ","
 
-runtime vimrcs/mucomplete.vim
+if has("vim9script")
+    runtime vimrcs/vimcomplete.vim
+    runtime vimrcs/language_servers.vim
+endif
 runtime vimrcs/airline.vim
 runtime vimrcs/fzf.vim
-runtime vimrcs/language_servers.vim
 runtime vimrcs/misc_helpers.vim
 runtime vimrcs/nerdtree.vim
 runtime vimrcs/asyncrun.vim
@@ -35,6 +37,9 @@ set hlsearch
 " Better completion in command mode
 "set wildmenu
 set wildmode=longest:full
+if has("patch-9.1.463")
+    set wildoptions+=fuzzy
+endif
 " Line numbers
 set nu
 " Use 4 spaces rather than tabs
@@ -44,6 +49,16 @@ set shiftwidth=4
 set softtabstop=4
 set expandtab
 set smarttab
+
+" Completion
+set complete=.,w,b,u,k
+set completeopt=menu,preview,menuone,noselect
+if has("patch-9.1.463")
+    set completeopt+=fuzzy,fuzzycollect
+endif
+
+" Balloon
+set balloonevalterm
 
 " Enable histogram diff
 if has('nvim-0.3.2') || has("patch-8.1.0360")

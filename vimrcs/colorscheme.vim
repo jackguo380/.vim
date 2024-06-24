@@ -10,6 +10,21 @@ hi link LspCxxHlSymParameter NONE
 hi link LspCxxHlSymUnknown NONE
 hi! LspCxxHlSymNamespace guifg=#FCE94F ctermfg=yellow gui=none cterm=none
 hi! LspCxxHlSynEnumMember guifg=#AD7FA8 ctermfg=Magenta gui=none cterm=none
+
+" LSP highlighting fixes
+hi link LspSemanticVariable NONE
+hi link LspSemanticParameter NONE
+hi link LspSemanticProperty NONE
+hi link LspSemanticModifier Keyword
+hi link LspSemanticNamespace LspCxxHlSymNamespace
+hi link LspSemanticEnumMember LspCxxHlSynEnumMember
+hi link LspInlayHintsType Conceal
+
+hi LspDiagVirtualTextError cterm=underline ctermfg=LightRed ctermbg=none
+hi LspDiagVirtualTextWarning cterm=underline ctermfg=LightYellow ctermbg=none
+hi LspDiagVirtualTextInfo cterm=underline ctermfg=LightBlue ctermbg=none
+hi LspDiagVirtualTextHint cterm=underline ctermfg=LightGray ctermbg=none
+
 " Fix for keywords like virtual and other function modifiers
 hi! link StorageClass Statement
 " Fix vim-cpp-modern highlighting namespaces same as enums
@@ -32,9 +47,8 @@ hi! Normal ctermbg=none
 let python_highlight_all=1
 
 " bold the cursor line
-"set cursorline
-set nocursorline " Need to disable this until https://github.com/vim/vim/issues/2584 is fixed
-hi CursorLine term=bold cterm=bold
+set cursorline
+"hi CursorLine term=bold cterm=bold
 hi CursorLineNr term=bold cterm=bold ctermbg=black
 
 "" Get the highlight group

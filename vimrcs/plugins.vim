@@ -29,21 +29,21 @@ Plug 'tpope/vim-sensible'
 " Surround text objects
 Plug 'tpope/vim-surround'
 
-" Completion
-Plug 'lifepillar/vim-mucomplete'
-
 " Language server support
-"Plug '~/Documents/Github/LanguageClient-neovim'
-Plug 'autozimu/LanguageClient-neovim', {
-	    \ 'branch': 'next',
-	    \ 'do': 'bash install.sh'
-	    \ }
+if has("vim9script")
+    Plug 'yegappan/lsp'
+endif
+
+" Completion
+if has("vim9script")
+    Plug 'girishji/vimcomplete'
+endif
 
 " Language server highlighting
 "Plug '~/Documents/Github/vim-lsp-cxx-highlight', {
-Plug 'jackguo380/vim-lsp-cxx-highlight', {
-	    \ 'for': ['c', 'cpp']
-	    \ }
+"Plug 'jackguo380/vim-lsp-cxx-highlight', {
+"	    \ 'for': ['c', 'cpp']
+"	    \ }
 
 " Rust colors, indent, etc.
 Plug 'rust-lang/rust.vim', {
@@ -107,7 +107,7 @@ Plug 'itspriddle/vim-shellcheck'
 call plug#end()
 
 " Enable termdebug
-packadd termdebug
+"packadd termdebug
 
 au FileType rust let g:termdebugger = 'rust-gdb'
 au FileType c,cpp let g:termdebugger = './gdb'
