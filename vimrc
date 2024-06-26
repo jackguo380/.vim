@@ -65,6 +65,17 @@ if has('nvim-0.3.2') || has("patch-8.1.0360")
     set diffopt=filler,internal,algorithm:histogram,indent-heuristic
 endif
 
+" Swapfiles
+if !has("nvim")
+    if !isdirectory(expand("~/.vimswap"))
+        call mkdir(expand("~/.vimswap"), "p")
+    endif
+    set directory^=~/.vimswap//
+endif
+
+set mouse=
+set cino+=(0
+
 let c_space_errors=1
 
 "use jj to escape insert mode

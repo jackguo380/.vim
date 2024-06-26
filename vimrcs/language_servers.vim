@@ -8,6 +8,7 @@ nmap csfi :LspGotoImpl<CR>
 nmap csft :LspGotoDeclaration<CR>
 nmap csfh :LspHover<CR>
 nmap csfc :LspIncomingCalls<CR>
+nmap csfe :LspDiagShow<CR>
 
 # TODO? Find a replacement for these
 # nmap csfd :call LanguageClient#findLocations({'method':'$ccls/inheritance', 'derived': v:true})<CR>
@@ -17,6 +18,7 @@ nmap csfc :LspIncomingCalls<CR>
 var lspOpts = {
     autoComplete: v:false,
     omniComplete: v:false,
+    useQuickfixForLocations: v:true,
     autoHighlightDiags: v:true,
     completionMatcher: 'fuzzy',
     semanticHighlight: v:true,
@@ -26,39 +28,75 @@ var lspOpts = {
 }
 autocmd User LspSetup call LspOptionsSet(lspOpts)
 
-# Debug Logging
-g:lsp_cxx_hl_log_file = '/tmp/lsp-cxx-hl.log'
-#let g:lsp_cxx_hl_verbose_log = 1
+def AddWorkspaceDirs(ws_dirs: list<string>)
+    for ws_root in ws_dirs
+        echomsg printf("Adding Workspace: %s", ws_root)
+        execute("LspWorkspaceAddFolder " .. ws_root)
+    endfor
+enddef
 
-g:lsp_cxx_hl_use_text_props = 1
-
-#let g:lsp_cxx_hl_use_mode_delay = 1
-#let g:lsp_cxx_hl_edit_delay_ms = 1000
-
-if executable('pylsp')
-    #let g:LanguageClient_serverCommands['python'] = {
-    #            \ 'name': 'python3',
-    #            \ 'command': ['pylsp'],
-    #            \ 'initializationOptions': {}
-    #        \ }
+# Detect custom workspace list
+var lsp_ws_dirs: list<string>
+var lsp_list_file = findfile('.vim_lsp_ws_dir_list', expand('%:p:h', 1) .. ';')
+if filereadable(lsp_list_file)
+    lsp_ws_dirs = readfile(lsp_list_file)
+    autocmd User LspAttached call AddWorkspaceDirs(lsp_ws_dirs)
 endif
 
-var clangdServer = [{}]
+# Custom LSP args
+var lsp_args: list<string> = []
+var lsp_args_file = findfile('.vim_lsp_args', expand('%:p:h', 1) .. ';')
+if filereadable(lsp_args_file)
+    lsp_args = readfile(lsp_args_file)
+endif
+
+var lsp_servers: list<dict<any>> = []
+if executable('pylsp')
+    lsp_servers += [{
+        name: 'pylsp',
+        filetype: ['python'],
+        path: 'pylsp',
+        args: []
+    }]
+endif
+
+if executable('cwls')
+    lsp_servers += [{
+        name: 'cwls',
+        filetype: ['python', 'c', 'cpp', 'java', 'sh', 'java'],
+        path: 'cwls',
+        args: []
+    }]
+endif
+
 if executable('clangd')
-    clangdServer = [{
+    lsp_servers += [{
         name: 'clang',
         filetype: ['c', 'cpp'],
         path: 'clangd',
-        rootSearch: ['.clangd', 'compile_commands.json'],
+        rootSearch: ['compile_commands.json'],
         args: []
     }]
-    autocmd User LspSetup call LspAddServer(clangdServer)
 endif
 
-#if isdirectory(g:my_vim_directory . '/jdt-language-server')
-#    var bemol_dir = findfile('.bemol', expand('%:p:h', 1) . ';')
-#    var ws_root_folders = ''
-#    if bemol_dir != ''
-#        ws_root_folders = fnamemodify(bemol_dir ':p:h') . '/ws_root_folders'
-#    endif
-#endif
+if isdirectory(g:my_vim_directory .. '/jdt') && !empty(lsp_ws_dirs)
+    var workspace_uris: list<string> = []
+
+    for ws_dir in lsp_ws_dirs
+        workspace_uris->add('file://' .. ws_dir)
+    endfor
+
+    lsp_servers += [{
+        name: 'eclipse.jdt.ls',
+        filetype: ['java'],
+        path: g:my_vim_directory .. '/jdt/bin/jdtls',
+        args: ['-data', g:my_project_root .. '/.jdtls'] + lsp_args,
+        initializationOptions: {
+            workspaceFolders: workspace_uris
+        }
+    }]
+endif
+
+if !empty(lsp_servers)
+    autocmd User LspSetup call LspAddServer(lsp_servers)
+endif
