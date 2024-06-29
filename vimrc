@@ -54,7 +54,10 @@ set smarttab
 set complete=.,w,b,u,k
 set completeopt=menu,preview,menuone,noselect
 if has("patch-9.1.463")
-    set completeopt+=fuzzy,fuzzycollect
+    set completeopt+=fuzzy
+    if has("patch-9.1.503")
+        set completeopt+=fuzzycollect
+    endif
 endif
 
 " Balloon
